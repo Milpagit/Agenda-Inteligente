@@ -1,0 +1,59 @@
+/* src/calendar/components/Navbar.css */
+
+.navbar-container {
+  height: 60px; /* ✅ Más delgada */
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: var(--shadow-soft); /* ✅ Sombra suave */
+  z-index: 10;
+}
+
+.navbar-brand {
+  font-weight: 600; /* semibold */
+  color: #333;
+  font-size: 1.2em;
+}
+
+.navbar-right-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #46487a; /* Color principal */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: none;
+  color: #d9534f; /* Rojo suave */
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 600; /* semibold */
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #fef2f2; /* Fondo rojo muy claro al pasar el mouse */
+}
+
+.logout-btn i {
+  margin-right: 8px;
+}

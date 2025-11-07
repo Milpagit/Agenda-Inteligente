@@ -1,0 +1,39 @@
+/* src/calendar/pages/CalendarPage.css */
+
+.calendar-screen {
+  display: flex;
+  height: calc(
+    100vh - 80px
+  ); /* Resta la altura del Navbar para ocupar el resto de la pantalla */
+}
+
+.calendar-main-content {
+  flex-grow: 1; /* Permite que esta sección ocupe todo el espacio disponible */
+  padding: 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- ESTILOS PARA PANTALLAS PEQUEÑAS (DISEÑO RESPONSIVO) --- */
+/* Estas reglas se aplican si el ancho de la pantalla es de 1200px o menos */
+@media (max-width: 1200px) {
+  .calendar-screen {
+    /* Cambia el layout a una sola columna, apilando los elementos */
+    flex-direction: column;
+    height: auto; /* Permite que la página haga scroll vertical */
+  }
+
+  /* La barra lateral ahora ocupa todo el ancho */
+  .calendar-sidebar {
+    width: 100%;
+    height: auto;
+    overflow-y: visible; /* Quita el scroll interno */
+    border-right: none; /* Elimina el borde derecho */
+    border-bottom: 1px solid #e0e0e0; /* Añade un separador inferior */
+  }
+
+  .calendar-main-content {
+    padding: 10px; /* Reduce el padding en pantallas más pequeñas */
+  }
+}

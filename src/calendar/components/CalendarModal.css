@@ -1,0 +1,84 @@
+/* src/calendar/components/CalendarModal.css */
+
+/* Estilos para el contenedor de fechas y horas */
+.date-time-picker-row {
+  display: flex;
+  align-items: flex-end; /* Alinea verticalmente los elementos abajo */
+  gap: 15px; /* Espacio entre los selectores y la casilla */
+  margin-bottom: 15px;
+  flex-wrap: wrap; /* Permite que la casilla baje si no hay espacio */
+}
+
+.date-time-group {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Permite que los selectores ocupen espacio */
+}
+
+.date-time-group label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Ajustes específicos para react-datepicker dentro del modal */
+.react-datepicker-wrapper {
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+}
+
+.react-datepicker__input-container input {
+  width: 100%; /* El input debe ocupar todo el contenedor */
+}
+
+/* Estilo para la casilla "Todo el día" */
+.all-day-checkbox {
+  margin-bottom: 10px; /* Alinea con la parte inferior de los inputs */
+  margin-left: 5px; /* Pequeño espacio a la izquierda */
+  align-self: flex-end; /* Asegura que esté alineado abajo */
+  padding-bottom: 5px; /* Ajuste fino de alineación */
+}
+
+/* Asegurar que las filas del formulario tengan espacio */
+.form-group {
+  margin-bottom: 15px !important; /* Aumenta el espacio entre filas */
+}
+
+/* Aumentar tamaño del textarea */
+textarea.form-control {
+  min-height: 80px;
+}
+
+/* Estilos base del modal (puedes tenerlos en styles.css) */
+.modal {
+  background: white;
+  border-radius: 8px; /* Bordes más suaves */
+  color: rgb(51, 51, 51);
+  display: inline-block; /* Cambiado para mejor control */
+  max-height: 90vh; /* Límite de altura */
+  max-width: 550px;
+  width: 90%;
+  outline: none;
+  padding: 25px; /* Más padding */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Scroll si el contenido es muy alto */
+}
+
+.modal h1 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.modal hr {
+  margin-top: 15px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.modal .btn-block {
+  width: 100%;
+  margin-top: 15px;
+}

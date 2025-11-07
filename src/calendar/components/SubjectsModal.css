@@ -1,0 +1,308 @@
+/* src/calendar/components/SubjectsModal.css */
+
+/* --- Estilos Generales del Modal --- */
+.subjects-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.subjects-modal-header h2 {
+  margin: 0;
+  color: #333; /* Color de título más oscuro */
+  font-size: 1.4em; /* Ligeramente más grande */
+}
+
+/* Contenedor principal dentro del modal */
+.subjects-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Estilos para la Sección de Importación --- */
+.import-schedule-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.import-schedule-section h5 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #46487a; /* Color primario */
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.import-schedule-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espacio entre input de archivo, fecha y botón */
+}
+
+/* Estilo para el input de archivo */
+.import-schedule-section .form-control[type="file"] {
+  padding: 8px 12px;
+  border: 1px solid #ced4da; /* Borde estándar */
+  border-radius: 8px;
+}
+.import-schedule-section .form-control[type="file"]::file-selector-button {
+  margin-right: 10px;
+  border: none;
+  background: #e0dffd; /* Morado claro */
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #46487a; /* Morado oscuro */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.import-schedule-section
+  .form-control[type="file"]::file-selector-button:hover {
+  background: #d1cffc;
+}
+
+/* Para mostrar el nombre del archivo seleccionado */
+.file-name {
+  font-size: 0.8em;
+  color: #6c757d;
+  display: block;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ajustes para el DatePicker en esta sección */
+.import-schedule-section .react-datepicker-wrapper {
+  width: 100%;
+}
+.import-schedule-section .react-datepicker__input-container input {
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  padding: 8px 12px; /* Consistencia con otros inputs */
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+}
+
+/* Botón de importar */
+.import-schedule-btn {
+  width: 100%;
+  padding: 10px 15px;
+  justify-content: center; /* Centrar icono y texto */
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, color 0.2s;
+  background-color: #6c757d; /* Gris secundario por defecto */
+  color: white;
+}
+.import-schedule-btn:hover:not(:disabled) {
+  background-color: #5a6268; /* Gris más oscuro */
+}
+
+/* Estilo cuando está deshabilitado */
+.import-schedule-btn:disabled {
+  background-color: #ced4da; /* Gris claro */
+  cursor: not-allowed;
+  color: #6c757d;
+}
+
+/* Icono de carga giratorio */
+.import-schedule-btn .fa-spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Estilos para la Sección de Añadir Manualmente --- */
+.add-subject-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.add-subject-section h5 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #46487a;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.add-subject-form {
+  display: flex;
+  flex-direction: column; /* Apilado vertical */
+  gap: 15px; /* Espacio entre los elementos */
+  align-items: stretch; /* Elementos ocupan todo el ancho */
+}
+
+.form-group-name,
+.form-group-color {
+  width: 100%; /* Ocupa todo el ancho */
+}
+
+.form-group-name label,
+.form-group-color label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #555; /* Color de label más suave */
+}
+
+/* Input de nombre */
+.form-group-name input {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  width: 100%; /* Asegura que ocupe el ancho */
+  box-sizing: border-box; /* Incluye padding y borde en el ancho */
+}
+
+/* Paleta de Colores */
+.color-palette {
+  display: flex;
+  flex-wrap: wrap; /* Si no caben, bajan */
+  gap: 10px; /* Espacio entre círculos */
+  padding: 10px; /* Más padding interno */
+  background-color: #f8f9fa; /* Fondo claro */
+  border-radius: 8px;
+  border: 1px solid #eee; /* Borde sutil */
+}
+
+.color-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; /* Círculos */
+  border: 3px solid transparent; /* Borde transparente para 'selected' */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada en hover */
+}
+
+/* Estilo para el color seleccionado */
+.color-swatch.selected {
+  border-color: #ffffff; /* Borde blanco */
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px #46487a, 0 4px 8px rgba(0, 0, 0, 0.2); /* Usa tu color primario */
+}
+
+/* Botón de añadir manual */
+.btn-add-subject {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  margin-top: 5px; /* Pequeño espacio arriba */
+  background-color: #46487a; /* Color primario */
+  border-color: #46487a;
+}
+.btn-add-subject:hover {
+  background-color: #3a3c63; /* Primario más oscuro */
+  border-color: #3a3c63;
+}
+
+/* --- Estilos para la Lista de Materias Existentes --- */
+h5 {
+  /* Estilo general para los títulos h5 de secciones */
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #46487a;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.subjects-list {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* Quita margen por defecto */
+  max-height: 250px; /* Altura máxima antes de hacer scroll */
+  overflow-y: auto; /* Scroll si hay muchas materias */
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  margin-bottom: 8px;
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 8px;
+  border: 1px solid #eee;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
+}
+
+.subject-item:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra un poco mayor en hover */
+}
+
+/* Círculo de color en la lista */
+.subject-color-dot {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1); /* Borde sutil para colores claros */
+}
+
+.subject-name {
+  flex-grow: 1; /* Ocupa el espacio restante */
+  font-weight: 500;
+  color: #333;
+  margin-right: 10px; /* Espacio antes del botón de borrar */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #dc3545; /* Rojo */
+  font-size: 1.4em;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  opacity: 0.6; /* Un poco más sutil */
+  transition: opacity 0.2s, color 0.2s;
+  flex-shrink: 0; /* Evita que se encoja */
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  color: #c82333; /* Rojo más oscuro en hover */
+}
+
+/* Mensaje si no hay materias */
+.no-subjects-message {
+  padding: 15px;
+  text-align: center;
+  color: #6c757d; /* Gris */
+  font-style: italic;
+  border: 1px dashed #eee;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* --- Limpieza de estilos viejos (si existían) --- */
+.form-control-color {
+  display: none; /* Ocultamos el input feo original si aún existiera */
+}

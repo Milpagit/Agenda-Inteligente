@@ -1,0 +1,159 @@
+/* Modal */
+.ReactModalPortal > div {
+  opacity: 0;
+}
+
+.ReactModalPortal .ReactModal__Overlay {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 999;
+}
+
+.modal-fondo {
+  background-color: rgba(0, 0, 0, 0.3);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  position: fixed;
+}
+
+.ReactModalPortal .ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModalPortal .ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+
+.modal {
+  background: white;
+  border-radius: 5px;
+  color: rgb(51, 51, 51);
+  display: inline;
+  max-height: 500px;
+  max-width: 500px;
+  outline: none;
+  padding: 10px;
+}
+
+/* FABS */
+
+.fab {
+  border-radius: 100%;
+  bottom: 25px;
+  font-size: 25px;
+  width: 70px;
+  height: 70px;
+  position: fixed;
+  right: 25px; /* ✅ ASEGÚRATE DE QUE ESTA LÍNEA DICE 'right' */
+  box-shadow: var(--shadow-medium);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 100;
+}
+
+.fab-danger {
+  border-radius: 100%;
+  /* --- CORRECCIÓN --- */
+  /* Lo movemos arriba del botón azul (+), 70px de alto + 15px de espacio */
+  bottom: 110px;
+  font-size: 22px;
+  width: 70px;
+  height: 70px;
+  position: fixed;
+  right: 25px; /* <-- Cambiado de 'left' a 'right' */
+  /* --- FIN CORRECCIÓN --- */
+  box-shadow: var(--shadow-medium);
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.fullscreen-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+/* src/App.css */
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  /* Fuente moderna, preferiblemente una de Google Fonts si la quieres exacta */
+  font-family: "Inter", sans-serif; /* Puedes elegir otra, como Roboto, Open Sans, etc. */
+  background-color: #f8f9fa; /* Un fondo muy claro */
+  color: #333;
+}
+
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.fab[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: 120%; /* Posiciona el tooltip a la izquierda del botón */
+  top: 50%;
+  transform: translateY(-50%);
+
+  background-color: #333;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+
+  /* Inicialmente oculto */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* El pequeño triángulo/flecha */
+.fab[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #333; /* Triángulo apuntando a la derecha */
+
+  /* Inicialmente oculto */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* Muestra el tooltip al pasar el mouse sobre el FAB */
+.fab[data-tooltip]:hover::after,
+.fab[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.5s; /* Pequeño retraso para que no aparezca al instante */
+}
+
+.fab-danger {
+  /* ... (estilos del fab de eliminar, puedes aplicarle también la sombra) ... */
+  box-shadow: var(--shadow-medium);
+}

@@ -1,0 +1,67 @@
+/* src/calendar/components/RecommendationsWidget.css */
+
+.recommendation-widget {
+  background-color: #e0dffd; /* Morado claro de tu paleta */
+  border-radius: 12px;
+  padding: 15px;
+  margin: 20px 0;
+  border: 1px solid #d1cffc;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #46487a; /* Morado oscuro */
+}
+
+.widget-header .fa-lightbulb {
+  color: #ffc212; /* Amarillo de tu paleta */
+  font-size: 1.2em;
+}
+
+.widget-header h4 {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.widget-text {
+  font-size: 0.9em;
+  color: #5c5e8f;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+.widget-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.widget-actions button {
+  flex-grow: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.widget-actions .btn-accept {
+  background-color: #46487a;
+  color: white;
+}
+.widget-actions .btn-accept:hover {
+  background-color: #3a3c68;
+}
+
+.widget-actions .btn-dismiss {
+  background-color: transparent;
+  color: #7786c6;
+  border: 1px solid #7786c6;
+}
+.widget-actions .btn-dismiss:hover {
+  background-color: #edeefb;
+}

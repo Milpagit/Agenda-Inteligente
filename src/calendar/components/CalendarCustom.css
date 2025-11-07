@@ -1,0 +1,276 @@
+/* src/components/CalendarCustom.css */
+
+/* --- Variables de la Paleta de Colores --- */
+:root {
+  --color-primary-dark: #46487a; /* Morado Oscuro */
+  --color-primary-medium: #7786c6; /* Morado Medio */
+  --color-primary-light: #e0dffd; /* Morado Claro */
+  --color-accent-yellow: #ffc212; /* Amarillo */
+  --color-accent-pink: #f9b0c3; /* Rosa */
+  --color-text-dark: #333;
+  --color-text-light: #666;
+  --color-border: #e0e0e0;
+  --color-bg-day-today: #f0f0f5; /* Fondo del día actual */
+  --color-bg-default: #ffffff;
+}
+
+/* --- ESTILO BASE DE REACT BIG CALENDAR --- */
+
+/* Contenedor principal del calendario */
+.rbc-calendar {
+  height: 100%;
+  font-family: "Inter", sans-serif; /* Consistencia con la fuente global */
+  background-color: var(--color-bg-default);
+  border-radius: 12px; /* Bordes redondeados para el calendario completo */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  overflow: hidden; /* Asegura que los bordes redondeados se vean bien */
+}
+
+/* --- Header del Calendario (Navegación y Vistas) --- */
+.rbc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-default);
+}
+
+.rbc-toolbar-label {
+  font-size: 1.5em; /* Tamaño de la fecha/mes */
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.rbc-btn-group button {
+  background-color: transparent;
+  color: var(--color-text-dark);
+  border: 1px solid var(--color-border);
+  padding: 8px 15px;
+  border-radius: 8px;
+  margin: 0 3px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.rbc-btn-group button:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary-medium);
+}
+
+.rbc-btn-group button.rbc-active {
+  background-color: var(--color-primary-dark);
+  color: var(--color-bg-default);
+  border-color: var(--color-primary-dark);
+}
+
+/* Botones de navegación (prev, next, today) */
+.rbc-toolbar button:first-child,
+.rbc-toolbar button:last-child {
+  border-radius: 8px;
+}
+.rbc-toolbar .rbc-btn-group:first-child button:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+.rbc-toolbar .rbc-btn-group:first-child button:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+/* --- Días de la Semana --- */
+.rbc-header {
+  padding: 10px 0;
+  font-weight: 600;
+  color: var(--color-text-light);
+  border-bottom: 1px solid var(--color-border) !important;
+  background-color: var(--color-bg-default);
+}
+
+/* Día Actual Resaltado */
+.rbc-day-bg.rbc-today {
+  background-color: var(--color-bg-day-today);
+}
+
+/* --- Celdas de Días --- */
+.rbc-month-view .rbc-row-bg {
+  border-left: 1px solid var(--color-border);
+}
+.rbc-month-view .rbc-day-bg {
+  border: none; /* Eliminar bordes internos redundantes */
+}
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid var(--color-border);
+}
+
+/* Número del día en la celda */
+.rbc-date-cell {
+  padding: 8px;
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+
+/* --- ESTILO DE LOS EVENTOS (LA CLAVE DEL LOOK MODERNO) --- */
+.rbc-event {
+  /* --- CORRECCIÓN 1 --- */
+  /* Se quitó !important. Ahora tomará el color de eventStyleGetter */
+  background-color: var(--color-primary-medium);
+
+  /* Se quitó !important. */
+  border: none;
+
+  border-radius: 8px !important; /* Bordes redondeados */
+  padding: 5px 8px !important;
+  margin-bottom: 4px !important; /* Espacio entre eventos */
+  font-size: 0.85em;
+
+  /* --- CORRECCIÓN 2 --- */
+  /* Se quitó !important. Ahora tomará el color "white" de eventStyleGetter */
+  color: white;
+
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra suave para efecto de tarjeta */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* Asegura que el contenido no se desborde */
+}
+
+.rbc-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* Clase para el contenido de los eventos */
+.rbc-event-content {
+  white-space: normal; /* Permite saltos de línea en el título del evento */
+}
+
+/* Ejemplo de cómo usar los colores de la paleta para eventos */
+/* Puedes asignar estos colores dinámicamente en tus eventos */
+.rbc-event.color-primary-dark {
+  background-color: var(--color-primary-dark);
+  color: var(--color-bg-default) !important;
+}
+.rbc-event.color-primary-medium {
+  background-color: var(--color-primary-medium);
+  color: var(--color-bg-default) !important;
+}
+.rbc-event.color-primary-light {
+  background-color: var(--color-primary-light);
+  color: var(--color-text-dark) !important;
+}
+.rbc-event.color-accent-yellow {
+  background-color: var(--color-accent-yellow);
+  color: var(--color-text-dark) !important;
+}
+.rbc-event.color-accent-pink {
+  background-color: var(--color-accent-pink);
+  color: var(--color-text-dark) !important;
+}
+
+/* Asegurar que los fondos de los eventos no tengan el color de RBK */
+.rbc-event-alt {
+  background-color: transparent !important;
+}
+
+/* Ajustes para la vista de día/semana si la usas */
+.rbc-time-view .rbc-allday-cell,
+.rbc-agenda-view .rbc-agenda-cont {
+  border: 1px solid var(--color-border);
+}
+.rbc-time-view .rbc-label {
+  color: var(--color-text-light);
+}
+.rbc-time-view .rbc-timeslot-group {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Asegurar bordes entre los días en la vista de mes y semana */
+.rbc-row-segment .rbc-event:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.rbc-row-segment .rbc-event:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  /* Fuente moderna, preferiblemente una de Google Fonts si la quieres exacta */
+  font-family: "Inter", sans-serif; /* Puedes elegir otra, como Roboto, Open Sans, etc. */
+  background-color: #f8f9fa; /* Un fondo muy claro */
+  color: #333;
+}
+/* src/calendar/components/CalendarCustom.css */
+
+/* ... (todos tus estilos anteriores) ... */
+
+/* ✅ --- MEJORAS AL CALENDARIO PRINCIPAL --- ✅ */
+
+/* 1. Resaltar el día al pasar el mouse (Hover) */
+.rbc-month-view .rbc-day-bg:hover {
+  background-color: #f5f5f5; /* Un gris muy claro */
+  cursor: pointer;
+}
+
+/* 2. Hacer el día de hoy un círculo distintivo */
+.rbc-day-bg.rbc-today {
+  background-color: transparent; /* Quitamos el fondo completo de la celda */
+}
+
+/* Seleccionamos el número del día de hoy para convertirlo en círculo */
+.rbc-month-row
+  .rbc-day-bg.rbc-today
+  + .rbc-row-content
+  .rbc-date-cell
+  .rbc-button-link,
+.rbc-month-row
+  .rbc-day-bg.rbc-today
+  ~ .rbc-row-content
+  .rbc-date-cell
+  .rbc-button-link {
+  /* Fallback para estructura */
+  background-color: #46487a; /* Color principal */
+  color: white !important;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 auto; /* Centramos el círculo en la celda */
+}
+
+/* 3. Reducir el espaciado entre celdas (haciendo los bordes más finos) */
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  border: 1px solid #ddd; /* Borde general un poco más suave */
+}
+
+.rbc-header,
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row {
+  border-color: #eee; /* Bordes internos aún más suaves */
+}
+.rbc-date-cell.rbc-now .rbc-button-link {
+  background-color: #46487a; /* Tu color morado */
+  color: white !important; /* Forzamos el texto a ser blanco */
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 auto; /* Centramos el círculo */
+}
+
+/* 3. Nos aseguramos de que no se ponga azul al pasar el mouse */
+.rbc-date-cell.rbc-now .rbc-button-link:hover {
+  background-color: #3a3c63; /* Un morado un poco más oscuro */
+  color: white !important;
+}

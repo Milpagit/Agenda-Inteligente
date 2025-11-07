@@ -1,0 +1,119 @@
+/* src/calendar/components/HabitTracker.css */
+
+.habit-tracker-container {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.habit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.habit-header h3 {
+  margin: 0;
+  color: #46487a;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.add-habit-form {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.add-habit-form input {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  min-width: 0;
+}
+
+.add-habit-form button {
+  margin-left: 8px;
+  border: none;
+  background-color: #46487a;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  font-size: 1.5em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.habit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.habit-item {
+  position: relative;
+  padding: 12px 8px;
+  margin-bottom: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.habit-name {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.habit-week-tracker {
+  display: flex;
+  justify-content: space-between;
+}
+
+.day-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #aaa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.day-circle.completed {
+  background-color: #7786c6; /* Morado medio de tu paleta */
+  color: white;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 8px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.5em;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 5px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.habit-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: #d9534f;
+}

@@ -1,0 +1,99 @@
+/* src/calendar/components/CalendarToolbar.css */
+.custom-toolbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.toolbar-section-left,
+.toolbar-section-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-label {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #46487a;
+}
+
+.nav-btn,
+.nav-btn-arrow {
+  background-color: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.nav-btn:hover,
+.nav-btn-arrow:hover {
+  background-color: #f0f0f5;
+}
+
+/* --- Grupo de botones con animación --- */
+.view-btn-group {
+  display: flex;
+  position: relative;
+  background-color: #f0f0f5;
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.view-btn-group button {
+  background-color: transparent;
+  border: none;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #6c757d;
+  border-radius: 8px;
+  transition: color 0.3s ease;
+  z-index: 1; /* Para que esté por encima de la animación */
+}
+
+/* El botón activo tiene un color de texto diferente */
+.view-btn-group button.active {
+  color: #ffffff;
+}
+
+/* La magia de la animación deslizante */
+.view-btn-group::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  height: calc(100% - 8px);
+  width: var(--width, 80px); /* Ancho dinámico */
+  left: var(--left, 4px); /* Posición dinámica */
+  background-color: #ff5733; /* Usando el color naranja de la imagen */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición suave */
+  z-index: 0;
+}
+/* src/calendar/components/CalendarToolbar.css */
+
+/* ... (otros estilos) ... */
+
+/* La magia de la animación deslizante */
+.view-btn-group::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  height: calc(100% - 8px);
+  width: var(--width, 80px);
+  left: var(--left, 4px);
+
+  /* ✅ Cambiado de naranja al color principal de tu paleta */
+  background-color: #46487a;
+
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 0;
+}

@@ -1,0 +1,143 @@
+/* src/calendar/components/TaskList.css */
+
+.task-list-container {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.task-list-container h3 {
+  margin: 0;
+  color: #46487a;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.task-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.task-progress {
+  font-size: 0.8em;
+  font-weight: 600;
+  background-color: #e0dffd;
+  color: #46487a;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.add-task-form {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.add-task-form input {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  min-width: 0; /* Evita que el input empuje al botón */
+}
+
+/* ✅ Estilos del botón corregidos */
+.add-task-form button {
+  margin-left: 8px;
+  border: none;
+  background-color: #46487a;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  font-size: 1.5em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.task-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* ✅ Estilo para la tarjeta de tarea completada */
+.task-item.completed {
+  background-color: #f8f9fa;
+}
+
+.task-item input[type="checkbox"] {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+}
+
+.task-text {
+  color: #333;
+  font-weight: 500;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+/* ✅ Estilo para tachar el texto cuando la tarea está completada */
+.task-item.completed .task-text {
+  text-decoration: line-through;
+  color: #aaa;
+}
+/* src/calendar/components/TaskList.css */
+
+/* ... (resto de estilos) ... */
+
+.task-item {
+  /* ... */
+  position: relative; /* Necesario para posicionar el botón */
+}
+
+.delete-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.5em;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 5px;
+
+  /* Oculto por defecto */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* El botón aparece al pasar el mouse sobre la tarea */
+.task-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: #d9534f; /* Rojo al pasar el mouse */
+}
