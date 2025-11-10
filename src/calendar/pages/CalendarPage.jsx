@@ -5,6 +5,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../components/CalendarCustom.css";
 import "./CalendarPage.css";
 
+// Importa desde el "barril" de la carpeta 'calendar' (../index.js)
 import {
   Navbar,
   CalendarEvent,
@@ -14,9 +15,13 @@ import {
   Sidebar,
   CalendarToolbar,
   SubjectsModal,
+  ProactiveAlertModal, // <-- 1. Importación del nuevo modal
 } from "../";
 
+// Importa desde el "barril" de la carpeta 'helpers' (../../helpers/index.js)
 import { getMessagesES, localizer } from "../../helpers";
+
+// Importa desde el "barril" de la carpeta 'hooks' (../../hooks/index.js)
 import {
   useUiStore,
   useCalendarStore,
@@ -25,9 +30,11 @@ import {
   useHabitStore,
   useRecommendationStore,
   useSubjectStore,
+  useNotificationStore, // <-- 2. Importación del nuevo hook
 } from "../../hooks";
 
 export const CalendarPage = () => {
+  // --- Hooks ---
   const { user } = useAuthStore();
   const { openDateModal } = useUiStore();
   const { events, setActiveEvent, startLoadingEvents } = useCalendarStore();
@@ -35,12 +42,13 @@ export const CalendarPage = () => {
   const { startLoadingTasks } = useTaskStore();
   const { startLoadingHabits } = useHabitStore();
   const { startLoadingRecommendation } = useRecommendationStore();
+  const { startLoadingAlerts } = useNotificationStore(); // <-- 3. Usar el hook
 
   const [lastView, setLastView] = useState(
     localStorage.getItem("lastView") || "month"
   );
 
-  // Lógica para la animación del toolbar
+  // --- Lógica del Toolbar (sin cambios) ---
   const setToolbarStyle = (view) => {
     const root = document.documentElement;
     if (view === "month") {
@@ -58,7 +66,7 @@ export const CalendarPage = () => {
     }
   };
 
-  // Carga todos los datos cuando el usuario se autentica
+  // --- useEffect principal de carga de datos ---
   useEffect(() => {
     if (user.uid) {
       startLoadingEvents();
@@ -66,17 +74,16 @@ export const CalendarPage = () => {
       startLoadingHabits();
       startLoadingSubjects();
       startLoadingRecommendation();
+      startLoadingAlerts(); // <-- 4. LLAMAR A LA NUEVA FUNCIÓN
     }
   }, [user.uid]);
 
-  // Actualiza el estilo del toolbar cuando la vista cambia
+  // --- useEffect del Toolbar (sin cambios) ---
   useEffect(() => {
     setToolbarStyle(lastView);
   }, [lastView]);
 
-  // ==================================================================
-  // ========= FUNCIÓN CORREGIDA PARA PINTAR EVENTOS POR MATERIA =========
-  // ==================================================================
+  // --- Estilos de eventos (sin cambios) ---
   const eventStyleGetter = (event, start, end, isSelected) => {
     // Buscamos la materia completa en la lista de materias (subjects),
     // usando el ID que está guardado dentro del evento (event.subject).
@@ -96,6 +103,7 @@ export const CalendarPage = () => {
     return { style };
   };
 
+  // --- Handlers del calendario (sin cambios) ---
   const onDoubleClick = (event) => {
     openDateModal();
   };
@@ -110,10 +118,10 @@ export const CalendarPage = () => {
     setToolbarStyle(view);
   };
 
+  // --- Render ---
   return (
     <>
       <Navbar />
-
       <div className="calendar-screen">
         <Sidebar />
 
@@ -138,11 +146,10 @@ export const CalendarPage = () => {
           />
         </div>
       </div>
-
       {/* Renderiza todos los modales */}
       <CalendarModal />
       <SubjectsModal />
-
+      <ProactiveAlertModal /> {/* <-- 5. RENDERIZAR EL NUEVO MODAL */}
       {/* Renderiza los botones flotantes */}
       <FabAddNew />
       <FabDelete />

@@ -8,6 +8,7 @@ import json
 import traceback
 import pytz # --- CORRECCIÓN 1.3: Importamos pytz para manejar zonas horarias ---
 import datetime # --- CORRECCIÓN 3.2: Importamos datetime para el cálculo de la semana ---
+import unicodedata  # <-- ✅ 1. IMPORTACIÓN AÑADIDA
 from dateutil import rrule, parser as date_parser
 
 # Inicializar Firebase (solo una vez, es ligero)
@@ -296,6 +297,14 @@ def analyze_risk_on_schedule(event) -> None:
                 
                 # --- NOTA 1.2: Como acordamos, NO se modifica esta lógica de predicción ---
                 risk_prob = float(probs[0][0]) # Se mantiene en índice [0]
+
+                # --- ✅ NUEVA LÓGICA ---
+                # Guardamos el score de riesgo directamente en el perfil del usuario
+                user_doc_ref = db.collection('users').document(user_id)
+                user_doc_ref.update({
+                    'riskScore': risk_prob 
+                })
+                # --- FIN NUEVA LÓGICA ---
 
                 print(f"Usuario {user_id} - Probabilidad de riesgo: {risk_prob:.2f}")
                 processed_users += 1
@@ -735,3 +744,132 @@ def importSchedule(req: https_fn.Request) -> https_fn.Response:
     })
     
     return https_fn.Response(succ_body, status=200, headers=headers)
+# ===============================================================
+#  HELPER: NORMALIZAR TEXTO (para búsquedas)
+# ===============================================================
+def normalize(text: str):
+    """
+    Convierte a minúsculas, quita acentos y caracteres diacríticos.
+    (Como lo solicitaste)
+    """
+    text = text.lower()
+    text = unicodedata.normalize("NFD", text)
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
+
+
+# ===============================================================
+#  FUNCIÓN 4: OBTENER ALERTAS PROACTIVAS (Versión Final)
+# ===============================================================
+@https_fn.on_request(memory=256)
+def get_proactive_alerts(req: https_fn.Request) -> https_fn.Response:
+    """
+    Al iniciar sesión, revisa los eventos cercanos y el riesgo del usuario
+    para devolver alertas personalizadas.
+    """
+    
+    # --- Cabeceras CORS (Manejo de preflight y Content-Type) ---
+    cors_headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Content-Type': 'application/json' 
+    }
+    # Manejar preflight (como lo implementaste)
+    if req.method == "OPTIONS":
+        preflight_headers = cors_headers.copy()
+        del preflight_headers['Content-Type']
+        return https_fn.Response("", status=200, headers=preflight_headers)
+    
+    # --- 1. Autenticación ---
+    global db_client
+    if db_client is None:
+        db_client = firestore.client()
+    db = db_client
+    
+    try:
+        auth_header = req.headers.get('authorization', '')
+        parts = auth_header.split(None, 1)
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            raise ValueError("Auth token missing or invalid format (Bearer).")
+        id_token = parts[1].strip()
+        decoded_token = auth.verify_id_token(id_token)
+        user_id = decoded_token['uid']
+        user_name = decoded_token.get('name', 'Estudiante') 
+        
+    except Exception as auth_error:
+        print(f"Auth verification error: {auth_error}")
+        return https_fn.Response(json.dumps({'error': 'Invalid or expired token.'}), status=401, headers=cors_headers)
+
+    # --- 2. Definir Palabras Clave (Normalizadas) ---
+    KEYWORDS_LIST = [
+        # Evaluaciones
+        "examen", "evaluacion", "evaluación", "prueba", "quiz", "test",
+        "parcial", "final", "midterm", "ordinario", "extraordinario",
+        # Tareas / entregables
+        "tarea", "entrega", "entregar", "actividad", "homework", "assignment",
+        "pendiente", "subir", "deadline", "fecha limite", "fecha límite",
+        # Proyectos / trabajos
+        "proyecto", "trabajo", "ensayo", "informe", "reporte", "monografia",
+        "investigacion", "investigación", "documento", "avance", "propuesta",
+        # Presentaciones / exposiciones
+        "presentacion", "presentación", "expo", "exposición", "pitch",
+        # Reuniones con propósito académico
+        "revision", "revisión", "retroalimentacion", "retroalimentación",
+        "feedback",
+        # Cronogramas o recordatorios importantes
+        "fecha importante", "planificacion", "planificación", "agenda",
+    ]
+    KEYWORDS_NORMALIZED = [normalize(k) for k in KEYWORDS_LIST]
+    
+    
+    # --- 3. Lógica de Alertas ---
+    try:
+        # Obtener perfil de riesgo
+        user_doc = db.collection('users').document(user_id).get()
+        if not user_doc.exists:
+            return https_fn.Response(json.dumps({'alerts': []}), status=200, headers=cors_headers)
+            
+        user_data = user_doc.to_dict()
+        risk_score = user_data.get('riskScore', 0.3) 
+        
+        # Obtener eventos de la próxima semana
+        now = datetime.datetime.now(pytz.timezone("America/Mexico_City"))
+        one_week_later = now + datetime.timedelta(days=7)
+        
+        events_ref = db.collection(f'users/{user_id}/events')
+        query = events_ref.where('start', '>=', now).where('start', '<=', one_week_later).stream()
+
+        alerts_to_send = []
+        
+        for event in query:
+            event_title_original = event.to_dict().get('title', '')
+            event_title_norm = normalize(event_title_original)
+            
+            # Buscar keywords normalizadas en el título normalizado
+            if any(keyword in event_title_norm for keyword in KEYWORDS_NORMALIZED):
+                
+                # --- ✅ LÓGICA FINAL (MODO PRUEBA DESACTIVADO) ---
+                
+                if risk_score > 0.7: # Riesgo Muy Alto
+                    insistencia = "alta"
+                    texto = f"¡MUCHO OJO, {user_name}! Tienes '{event_title_original}' pronto. ¡Es crucial que empieces a prepararte ya!"
+                    alerts_to_send.append({'text': texto, 'insistencia': insistencia})
+                
+                elif risk_score > 0.5: # Riesgo Medio
+                    insistencia = "media"
+                    texto = f"Hola, {user_name}, solo un recordatorio proactivo: Tienes '{event_title_original}' esta semana. ¿Ya tienes un plan de estudio para esto?"
+                    alerts_to_send.append({'text': texto, 'insistencia': insistencia})
+                
+                else: 
+                    # (Riesgo Bajo)
+                    # No hacemos nada, no queremos molestar al usuario.
+                    continue 
+                # --- FIN DE LA LÓGICA FINAL ---
+                
+        # Devolver respuesta
+        return https_fn.Response(json.dumps({'alerts': alerts_to_send}), status=200, headers=cors_headers)
+
+    except Exception as e:
+        print(f"❌ Error generando alertas: {e}")
+        traceback.print_exc()
+        return https_fn.Response(json.dumps({'error': f'Error interno: {str(e)}'}), status=500, headers=cors_headers)

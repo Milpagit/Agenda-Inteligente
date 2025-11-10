@@ -34,7 +34,7 @@
   padding-bottom: 25px;
   border-bottom: 1px solid #eee;
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Dos columnas */
+  grid-template-columns: 1fr 1fr; /* Dos columnas en escritorio */
   gap: 20px;
 }
 
@@ -73,25 +73,19 @@
   font-size: 1.1em;
   font-weight: 600;
 }
-/* src/auth/pages/OnboardingPage.css */
 
-/* ... (otros estilos) ... */
-
+/* ... (tus otros estilos de slider-group, etc. van aquí) ... */
 .slider-group {
-  grid-column: 1 / -1; /* Ocupa todo el ancho */
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
 }
-
-/* ✅ Nuevo contenedor para el label y el valor */
 .slider-label-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
-
-/* ✅ Estilo para el valor numérico */
 .slider-value {
   font-weight: bold;
   color: #46487a;
@@ -100,18 +94,30 @@
   border-radius: 6px;
   font-size: 0.9em;
 }
-
 .slider-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espacio entre el 1, la barra y el 10 */
+  gap: 15px;
 }
-
 .slider-wrapper span {
   font-weight: 500;
   color: #aaa;
 }
-
 .slider-wrapper input[type="range"] {
-  flex-grow: 1; /* Hace que la barra ocupe el espacio disponible */
+  flex-grow: 1;
 }
+
+/* --- ✅ INICIO DE LA CORRECCIÓN RESPONSIVE --- */
+
+/* Estas reglas se aplican en pantallas de 768px o menos (tablets y móviles) */
+@media (max-width: 768px) {
+  .onboarding-form {
+    padding: 20px; /* Menos padding en móvil */
+  }
+
+  .form-section {
+    /* Pasa de 2 columnas a 1 columna */
+    grid-template-columns: 1fr;
+  }
+}
+/* --- ✅ FIN DE LA CORRECCIÓN RESPONSIVE --- */

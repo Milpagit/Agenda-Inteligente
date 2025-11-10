@@ -8,3 +8,4 @@ export * from "./useTaskStore";
 export * from "./useHabitStore";
 export * from "./useRecommendationStore";
 export * from "./useSubjectStore"; // ✅ Esta es la línea que faltaba
+export * from "./useNotificationStore"; // <-- ✅ AÑADE ESTA LÍNEA AL FINAL

@@ -274,3 +274,62 @@ body,
   background-color: #3a3c63; /* Un morado un poco más oscuro */
   color: white !important;
 }
+/* --- ✅ INICIO: MEJORAS VISTA DE AGENDA --- */
+
+/* 1. Añadimos espacio vertical entre los días y eventos */
+.rbc-agenda-view table {
+  border-collapse: separate; /* Permite usar border-spacing */
+  border-spacing: 0 8px; /* 8px de espacio vertical entre filas */
+}
+
+/* 2. Hacemos que la fila del Día (ej: "dom nov 09") sea un separador claro */
+.rbc-agenda-date-cell {
+  padding: 10px 5px !important;
+}
+.rbc-agenda-date-cell .rbc-button-link {
+  font-size: 1em;
+  font-weight: 600; /* Más grueso */
+  color: #333;
+  border-bottom: 2px solid #eee; /* Línea separadora */
+  padding-bottom: 8px;
+  display: block;
+}
+
+/* 3. Quitamos el tiempo de la fila del día (redundante) */
+.rbc-agenda-date-cell .rbc-agenda-time-cell {
+  display: none;
+}
+
+/* 4. Convertimos la fila del Evento en una "tarjeta" blanca */
+.rbc-agenda-row {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Para que la sombra y el borde se vean bien */
+}
+
+/* 5. EL CAMBIO MÁS IMPORTANTE:
+      Quitamos el color de fondo del evento y lo ponemos como un borde */
+.rbc-agenda-view .rbc-event {
+  /* Anulamos el estilo que viene de JavaScript */
+  background-color: transparent !important;
+  color: #333 !important; /* Hacemos el texto oscuro */
+
+  /* Creamos el acento de color */
+  border-left: 5px solid;
+
+  /* ¡Magia! RBC guarda el color de tu 'eventStyleGetter' 
+     en esta variable CSS para que podamos usarla */
+  border-left-color: var(--rbc-event-bg-color);
+
+  padding: 12px 15px;
+}
+
+/* 6. Ajustamos la celda del tiempo del evento */
+.rbc-agenda-time-cell {
+  padding: 12px 15px;
+  font-weight: 500;
+  color: #46487a; /* Color primario */
+}
+
+/* --- ✅ FIN: MEJORAS VISTA DE AGENDA --- */

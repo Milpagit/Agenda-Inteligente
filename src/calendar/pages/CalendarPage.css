@@ -13,6 +13,7 @@
   background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 /* --- ESTILOS PARA PANTALLAS PEQUEÑAS (DISEÑO RESPONSIVO) --- */

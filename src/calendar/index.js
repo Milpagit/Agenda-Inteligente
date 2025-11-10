@@ -19,3 +19,4 @@ export * from "./components/SubjectsModal";
 
 // Exporta todo lo de la carpeta 'pages'
 export * from "./pages/CalendarPage";
+export * from "./components/ProactiveAlertModal"; // <-- ✅ AÑADE ESTA LÍNEA AL FINAL

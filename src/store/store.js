@@ -8,6 +8,7 @@ import { taskSlice } from "./tasks/taskSlice";
 import { habitSlice } from "./habits/habitSlice";
 import { recommendationSlice } from "./recommendations/recommendationSlice";
 import { subjectSlice } from "./subjects/subjectSlice"; // Se importa el nuevo subjectSlice
+import { notificationSlice } from "./notifications/notificationSlice"; // <-- AÑADIR
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     habits: habitSlice.reducer,
     recommendations: recommendationSlice.reducer,
     subjects: subjectSlice.reducer, // ✅ Esta es la línea que faltaba
+    notifications: notificationSlice.reducer, // <-- AÑADIR
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

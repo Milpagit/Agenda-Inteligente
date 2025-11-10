@@ -18,6 +18,8 @@
   font-size: 1.5em;
   font-weight: 600;
   color: #46487a;
+  /* Evita que el texto largo se rompa en dos líneas en escritorio */
+  white-space: nowrap;
 }
 
 .nav-btn,
@@ -54,33 +56,15 @@
   color: #6c757d;
   border-radius: 8px;
   transition: color 0.3s ease;
-  z-index: 1; /* Para que esté por encima de la animación */
+  z-index: 1;
+  white-space: nowrap; /* Evita que "Semana" se parta */
 }
 
-/* El botón activo tiene un color de texto diferente */
 .view-btn-group button.active {
   color: #ffffff;
 }
 
-/* La magia de la animación deslizante */
-.view-btn-group::before {
-  content: "";
-  position: absolute;
-  top: 4px;
-  height: calc(100% - 8px);
-  width: var(--width, 80px); /* Ancho dinámico */
-  left: var(--left, 4px); /* Posición dinámica */
-  background-color: #ff5733; /* Usando el color naranja de la imagen */
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición suave */
-  z-index: 0;
-}
-/* src/calendar/components/CalendarToolbar.css */
-
-/* ... (otros estilos) ... */
-
-/* La magia de la animación deslizante */
+/* Animación deslizante */
 .view-btn-group::before {
   content: "";
   position: absolute;
@@ -88,12 +72,68 @@
   height: calc(100% - 8px);
   width: var(--width, 80px);
   left: var(--left, 4px);
-
-  /* ✅ Cambiado de naranja al color principal de tu paleta */
-  background-color: #46487a;
-
+  background-color: #46487a; /* Color principal */
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 0;
 }
+
+/* --- ✅ INICIO DE LA CORRECCIÓN RESPONSIVE --- */
+
+/* Se aplica en pantallas de 768px o menos (móviles) */
+@media (max-width: 768px) {
+  .custom-toolbar-container {
+    /* Apilamos las dos secciones (label y botones de vista) */
+    flex-direction: column;
+    align-items: stretch; /* Hacemos que ocupen todo el ancho */
+    gap: 15px; /* Espacio entre las dos secciones */
+    padding: 15px 10px; /* Menos padding lateral */
+  }
+
+  .toolbar-section-left {
+    /* Centramos los botones "Hoy, <, >" */
+    justify-content: center;
+    /* Hacemos que el label pase abajo si no cabe */
+    flex-wrap: wrap;
+  }
+
+  .toolbar-label {
+    /* Hacemos el texto más pequeño en móvil */
+    font-size: 1.2em;
+    /* Damos prioridad al label para que ocupe el ancho */
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px; /* Espacio entre el label y los botones "Hoy" */
+  }
+
+  .toolbar-section-right {
+    justify-content: center; /* Centramos el grupo de botones */
+  }
+
+  .view-btn-group {
+    /* Hacemos que los 4 botones ocupen el 100% del ancho */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+  }
+
+  .view-btn-group button {
+    /* Reducimos el padding para que quepan */
+    padding: 8px 5px;
+    font-size: 0.9em;
+  }
+
+  /* Ocultamos la animación deslizante en móvil, 
+     ya que es difícil recalcularla con el grid */
+  .view-btn-group::before {
+    display: none;
+  }
+
+  /* En móvil, el botón activo solo cambia de color */
+  .view-btn-group button.active {
+    background-color: #46487a;
+    color: white;
+  }
+}
+/* --- ✅ FIN DE LA CORRECCIÓN RESPONSIVE --- */
