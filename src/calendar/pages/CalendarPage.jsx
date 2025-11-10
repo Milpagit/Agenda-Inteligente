@@ -123,7 +123,7 @@ export const CalendarPage = () => {
     <>
       <Navbar />
       <div className="calendar-screen">
-        <Sidebar />
+        <Sidebar currentView={lastView} />
 
         <div className="calendar-main-content">
           <Calendar

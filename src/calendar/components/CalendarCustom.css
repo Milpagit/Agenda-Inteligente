@@ -19,14 +19,16 @@
 /* Contenedor principal del calendario */
 .rbc-calendar {
   height: 100%;
-  font-family: "Inter", sans-serif; /* Consistencia con la fuente global */
+  font-family: "Inter", sans-serif;
   background-color: var(--color-bg-default);
-  border-radius: 12px; /* Bordes redondeados para el calendario completo */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
-  overflow: hidden; /* Asegura que los bordes redondeados se vean bien */
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 /* --- Header del Calendario (Navegación y Vistas) --- */
+/* (Nota: Este .rbc-toolbar es el default, el tuyo está oculto
+   y reemplazado por CalendarToolbar.jsx, pero es bueno tenerlo) */
 .rbc-toolbar {
   display: flex;
   justify-content: space-between;
@@ -37,7 +39,7 @@
 }
 
 .rbc-toolbar-label {
-  font-size: 1.5em; /* Tamaño de la fecha/mes */
+  font-size: 1.5em;
   font-weight: 600;
   color: var(--color-primary-dark);
 }
@@ -65,21 +67,7 @@
   border-color: var(--color-primary-dark);
 }
 
-/* Botones de navegación (prev, next, today) */
-.rbc-toolbar button:first-child,
-.rbc-toolbar button:last-child {
-  border-radius: 8px;
-}
-.rbc-toolbar .rbc-btn-group:first-child button:last-child {
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-.rbc-toolbar .rbc-btn-group:first-child button:first-child {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-}
-
-/* --- Días de la Semana --- */
+/* --- Días de la Semana (Cabeceras) --- */
 .rbc-header {
   padding: 10px 0;
   font-weight: 600;
@@ -88,17 +76,12 @@
   background-color: var(--color-bg-default);
 }
 
-/* Día Actual Resaltado */
-.rbc-day-bg.rbc-today {
-  background-color: var(--color-bg-day-today);
-}
-
-/* --- Celdas de Días --- */
+/* --- Celdas de Días (Vista de Mes) --- */
 .rbc-month-view .rbc-row-bg {
   border-left: 1px solid var(--color-border);
 }
 .rbc-month-view .rbc-day-bg {
-  border: none; /* Eliminar bordes internos redundantes */
+  border: none;
 }
 .rbc-day-bg + .rbc-day-bg {
   border-left: 1px solid var(--color-border);
@@ -111,28 +94,22 @@
   font-weight: 500;
 }
 
-/* --- ESTILO DE LOS EVENTOS (LA CLAVE DEL LOOK MODERNO) --- */
+/* --- ESTILO DE LOS EVENTOS (VISTA DE MES) --- */
+/* (Esta es la corrección que hicimos para que los colores funcionen) */
 .rbc-event {
-  /* --- CORRECCIÓN 1 --- */
-  /* Se quitó !important. Ahora tomará el color de eventStyleGetter */
+  /* Se quitó !important. Ahora toma el color de eventStyleGetter */
   background-color: var(--color-primary-medium);
-
-  /* Se quitó !important. */
   border: none;
-
-  border-radius: 8px !important; /* Bordes redondeados */
+  border-radius: 8px !important;
   padding: 5px 8px !important;
-  margin-bottom: 4px !important; /* Espacio entre eventos */
+  margin-bottom: 4px !important;
   font-size: 0.85em;
-
-  /* --- CORRECCIÓN 2 --- */
-  /* Se quitó !important. Ahora tomará el color "white" de eventStyleGetter */
+  /* Se quitó !important. El color "white" lo pone eventStyleGetter */
   color: white;
-
   font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra suave para efecto de tarjeta */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden; /* Asegura que el contenido no se desborde */
+  overflow: hidden;
 }
 
 .rbc-event:hover {
@@ -140,122 +117,19 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
-/* Clase para el contenido de los eventos */
 .rbc-event-content {
-  white-space: normal; /* Permite saltos de línea en el título del evento */
+  white-space: normal;
 }
 
-/* Ejemplo de cómo usar los colores de la paleta para eventos */
-/* Puedes asignar estos colores dinámicamente en tus eventos */
-.rbc-event.color-primary-dark {
-  background-color: var(--color-primary-dark);
-  color: var(--color-bg-default) !important;
-}
-.rbc-event.color-primary-medium {
-  background-color: var(--color-primary-medium);
-  color: var(--color-bg-default) !important;
-}
-.rbc-event.color-primary-light {
-  background-color: var(--color-primary-light);
-  color: var(--color-text-dark) !important;
-}
-.rbc-event.color-accent-yellow {
-  background-color: var(--color-accent-yellow);
-  color: var(--color-text-dark) !important;
-}
-.rbc-event.color-accent-pink {
-  background-color: var(--color-accent-pink);
-  color: var(--color-text-dark) !important;
-}
+/* --- ✅ INICIO: CÍRCULO PARA EL DÍA DE HOY --- */
+/* (La corrección para resaltar el día actual) */
 
-/* Asegurar que los fondos de los eventos no tengan el color de RBK */
-.rbc-event-alt {
-  background-color: transparent !important;
-}
-
-/* Ajustes para la vista de día/semana si la usas */
-.rbc-time-view .rbc-allday-cell,
-.rbc-agenda-view .rbc-agenda-cont {
-  border: 1px solid var(--color-border);
-}
-.rbc-time-view .rbc-label {
-  color: var(--color-text-light);
-}
-.rbc-time-view .rbc-timeslot-group {
-  border-bottom: 1px solid var(--color-border);
-}
-
-/* Asegurar bordes entre los días en la vista de mes y semana */
-.rbc-row-segment .rbc-event:first-child {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-.rbc-row-segment .rbc-event:last-child {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  /* Fuente moderna, preferiblemente una de Google Fonts si la quieres exacta */
-  font-family: "Inter", sans-serif; /* Puedes elegir otra, como Roboto, Open Sans, etc. */
-  background-color: #f8f9fa; /* Un fondo muy claro */
-  color: #333;
-}
-/* src/calendar/components/CalendarCustom.css */
-
-/* ... (todos tus estilos anteriores) ... */
-
-/* ✅ --- MEJORAS AL CALENDARIO PRINCIPAL --- ✅ */
-
-/* 1. Resaltar el día al pasar el mouse (Hover) */
-.rbc-month-view .rbc-day-bg:hover {
-  background-color: #f5f5f5; /* Un gris muy claro */
-  cursor: pointer;
-}
-
-/* 2. Hacer el día de hoy un círculo distintivo */
+/* 1. Quitamos el fondo de la celda de hoy */
 .rbc-day-bg.rbc-today {
-  background-color: transparent; /* Quitamos el fondo completo de la celda */
+  background-color: transparent;
 }
 
-/* Seleccionamos el número del día de hoy para convertirlo en círculo */
-.rbc-month-row
-  .rbc-day-bg.rbc-today
-  + .rbc-row-content
-  .rbc-date-cell
-  .rbc-button-link,
-.rbc-month-row
-  .rbc-day-bg.rbc-today
-  ~ .rbc-row-content
-  .rbc-date-cell
-  .rbc-button-link {
-  /* Fallback para estructura */
-  background-color: #46487a; /* Color principal */
-  color: white !important;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0 auto; /* Centramos el círculo en la celda */
-}
-
-/* 3. Reducir el espaciado entre celdas (haciendo los bordes más finos) */
-.rbc-month-view,
-.rbc-time-view,
-.rbc-agenda-view {
-  border: 1px solid #ddd; /* Borde general un poco más suave */
-}
-
-.rbc-header,
-.rbc-day-bg + .rbc-day-bg,
-.rbc-month-row + .rbc-month-row {
-  border-color: #eee; /* Bordes internos aún más suaves */
-}
+/* 2. Aplicamos el círculo al NÚMERO del día de hoy */
 .rbc-date-cell.rbc-now .rbc-button-link {
   background-color: #46487a; /* Tu color morado */
   color: white !important; /* Forzamos el texto a ser blanco */
@@ -274,62 +148,36 @@ body,
   background-color: #3a3c63; /* Un morado un poco más oscuro */
   color: white !important;
 }
-/* --- ✅ INICIO: MEJORAS VISTA DE AGENDA --- */
+/* --- ✅ FIN: CÍRCULO PARA EL DÍA DE HOY --- */
 
-/* 1. Añadimos espacio vertical entre los días y eventos */
-.rbc-agenda-view table {
-  border-collapse: separate; /* Permite usar border-spacing */
-  border-spacing: 0 8px; /* 8px de espacio vertical entre filas */
+/* --- ✅ INICIO: MEJORAS VISTA DE DÍA (MÓVIL) --- */
+/* (Los estilos para que la Vista de Día se vea como en tu imagen) */
+
+/* 1. Suavizar las líneas de hora */
+.rbc-time-view .rbc-time-slot {
+  border-top: 1px solid #f0f0f0; /* Líneas casi invisibles */
 }
 
-/* 2. Hacemos que la fila del Día (ej: "dom nov 09") sea un separador claro */
-.rbc-agenda-date-cell {
-  padding: 10px 5px !important;
-}
-.rbc-agenda-date-cell .rbc-button-link {
-  font-size: 1em;
-  font-weight: 600; /* Más grueso */
-  color: #333;
-  border-bottom: 2px solid #eee; /* Línea separadora */
-  padding-bottom: 8px;
-  display: block;
-}
-
-/* 3. Quitamos el tiempo de la fila del día (redundante) */
-.rbc-agenda-date-cell .rbc-agenda-time-cell {
+/* 2. Ocultar la línea gruesa de "ahora" (opcional, pero más limpio) */
+.rbc-time-view .rbc-current-time-indicator {
   display: none;
 }
 
-/* 4. Convertimos la fila del Evento en una "tarjeta" blanca */
-.rbc-agenda-row {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  overflow: hidden; /* Para que la sombra y el borde se vean bien */
+/* 3. Estilo del evento (LA CLAVE) */
+.rbc-time-view .rbc-event {
+  border: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  border-radius: 8px !important; /* Bordes redondeados */
+
+  /* Añadimos "relleno" para que el texto no se pegue */
+  margin: 0 5px 3px 5px !important;
+  padding: 5px 8px !important;
 }
 
-/* 5. EL CAMBIO MÁS IMPORTANTE:
-      Quitamos el color de fondo del evento y lo ponemos como un borde */
-.rbc-agenda-view .rbc-event {
-  /* Anulamos el estilo que viene de JavaScript */
-  background-color: transparent !important;
-  color: #333 !important; /* Hacemos el texto oscuro */
-
-  /* Creamos el acento de color */
-  border-left: 5px solid;
-
-  /* ¡Magia! RBC guarda el color de tu 'eventStyleGetter' 
-     en esta variable CSS para que podamos usarla */
-  border-left-color: var(--rbc-event-bg-color);
-
-  padding: 12px 15px;
-}
-
-/* 6. Ajustamos la celda del tiempo del evento */
-.rbc-agenda-time-cell {
-  padding: 12px 15px;
+/* 4. Estilo del texto dentro del evento */
+.rbc-time-view .rbc-event-content {
+  font-size: 0.85em;
   font-weight: 500;
-  color: #46487a; /* Color primario */
+  /* El color de texto ya lo pone 'eventStyleGetter' como 'white' */
 }
-
-/* --- ✅ FIN: MEJORAS VISTA DE AGENDA --- */
+/* --- ✅ FIN: MEJORAS VISTA DE DÍA (MÓVIL) --- */

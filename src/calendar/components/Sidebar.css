@@ -12,6 +12,7 @@
 
   overflow-y: auto; /* Scroll vertical automático cuando el contenido es muy alto */
   flex-shrink: 0;
+  overflow-x: visible;
 }
 
 /* Estilo para la fecha grande */
@@ -86,4 +87,144 @@
   padding: 5px 0;
   font-size: 0.9em;
   text-align: center;
+}
+.risk-meter-container {
+  width: 100%;
+  margin: 25px 0; /* Espacio arriba y abajo */
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.risk-meter-container h5 {
+  margin: 0 0 10px 0;
+  color: #46487a; /* Color primario */
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+/* La barra gris de fondo */
+.risk-meter-bar {
+  width: 100%;
+  height: 12px;
+  background-color: #f0f0f5; /* Gris claro */
+  border-radius: 6px;
+  overflow: hidden; /* Para que la barra de relleno herede el borde redondeado */
+}
+
+/* El relleno de color (rojo, naranja o verde) */
+.risk-meter-fill {
+  height: 100%;
+  border-radius: 6px;
+  /* La transición hace que se anime suavemente */
+  transition: width 0.5s ease-out, background-color 0.5s ease;
+}
+
+/* La etiqueta de texto (Bajo, Medio, Alto) */
+.risk-meter-label {
+  display: block;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 0.9em;
+  text-align: right; /* Alinear el texto a la derecha */
+}
+/* ... (Tus estilos anteriores para .risk-meter-container, .risk-meter-bar, etc.) ... */
+
+/* --- ✅ ESTILOS PARA EL PIE DEL MEDIDOR Y TOOLTIP --- */
+
+/* 1. Contenedor del pie (para alinear el '?' y el texto) */
+.risk-meter-footer {
+  display: flex;
+  justify-content: space-between; /* '?' a la izq, 'Bajo (22%)' a la der */
+  align-items: center;
+  margin-top: 8px; /* Espacio sobre la barra */
+}
+
+/* 2. Estilo del icono '?' */
+.risk-tooltip-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #aaa; /* Gris neutral */
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 16px; /* Centra el '?' verticalmente */
+  text-align: center;
+  cursor: help; /* Cambia el cursor a 'ayuda' */
+  position: relative; /* Clave para posicionar el tooltip */
+}
+
+/* 3. Limpiamos el margen de la etiqueta que ahora está en el flex */
+.risk-meter-label {
+  margin-top: 0;
+  text-align: right;
+}
+
+/* --- 4. ESTILOS DEL TOOLTIP (EL CUADRO DE TEXTO) --- */
+/* Usamos '::after' para crear el cuadro de texto */
+.risk-tooltip-icon:hover::after {
+  content: attr(data-tooltip); /* Toma el texto del atributo HTML */
+  position: absolute;
+  bottom: 125%; /* Se posiciona 125% arriba del '?' */
+
+  /* --- ✅ CORRECCIÓN DE POSICIÓN --- */
+  left: 0; /* Anclamos el tooltip al borde IZQUIERDO del '?' */
+  transform: translateX(0); /* NO lo centramos horizontalmente */
+  /* --- FIN CORRECCIÓN --- */
+
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+
+  /* --- ✅ CORRECCIÓN DE ANCHO --- */
+  /* Lo hacemos un poco más angosto que la sidebar para que quepa */
+  width: 230px;
+  white-space: normal; /* Permite que el texto baje de línea */
+  /* --- FIN CORRECCIÓN --- */
+
+  z-index: 10;
+
+  /* Efecto de aparición */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s;
+  pointer-events: none; /* (Añadido por seguridad) */
+}
+
+/* 5. La "flecha" del tooltip */
+/* Usamos '::before' para crear el triángulo */
+.risk-tooltip-icon:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%; /* Justo entre el '?' y el cuadro */
+
+  /* --- ✅ CORRECCIÓN DE FLECHA --- */
+  /* Lo centramos sobre el icono '?' (que mide 16px) */
+  left: 8px;
+  transform: translateX(-50%); /* Centramos la flecha sobre el '?' */
+  /* --- FIN CORRECCIÓN --- */
+
+  border-width: 5px;
+  border-style: solid;
+  /* Triángulo apuntando hacia abajo */
+  border-color: #333 transparent transparent transparent;
+  z-index: 11;
+
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s;
+  pointer-events: none; /* (Añadido por seguridad) */
+}
+
+/* 6. Ocultar el tooltip por defecto */
+.risk-tooltip-icon::before,
+.risk-tooltip-icon::after {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* Evita que el mouse interactúe con el tooltip fantasma */
 }

@@ -34,13 +34,16 @@ export const useAuthStore = () => {
       const userDocRef = doc(FirebaseDB, `users/${user.uid}`);
       const userDocSnap = await getDoc(userDocRef);
 
-      // --- 2. CORRECCIÓN LÓGICA ---
-      // Esta lógica ahora se moverá a startRegister
-      // El listener ahora solo lee lo que ya existe.
+      // --- ✅ INICIO DE LA CORRECCIÓN ---
+      // Leemos todos los datos del perfil de Firestore
       const onboardingComplete =
         userDocSnap.exists() && userDocSnap.data().onboardingComplete;
       const cluster = userDocSnap.exists() ? userDocSnap.data().cluster : null;
-      // --- FIN CORRECCIÓN LÓGICA ---
+      // Añadimos el riskScore (con un valor por defecto si no existe)
+      const riskScore = userDocSnap.exists()
+        ? userDocSnap.data().riskScore
+        : 0.3;
+      // --- ✅ FIN DE LA CORRECCIÓN ---
 
       const { uid, displayName, email } = user;
 
@@ -50,6 +53,7 @@ export const useAuthStore = () => {
           uid: uid,
           onboardingComplete,
           cluster,
+          riskScore, // <-- ✅ AÑADIDO
         })
       );
     });

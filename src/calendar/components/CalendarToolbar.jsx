@@ -2,17 +2,27 @@
 import React, { useEffect, useRef } from "react";
 import "./CalendarToolbar.css";
 
-export const CalendarToolbar = ({ label, onNavigate, onView, view }) => {
-  const viewBtnGroupRef = useRef(); // Referencia al contenedor de botones
+// --- Acepta 'isMobile' como prop ---
+export const CalendarToolbar = ({
+  label,
+  onNavigate,
+  onView,
+  view,
+  isMobile,
+}) => {
+  const viewBtnGroupRef = useRef(); // Referencia para la animación
 
-  // Lógica de navegación (sin cambios)
+  // Lógica de navegación
   const goToBack = () => onNavigate("PREV");
   const goToNext = () => onNavigate("NEXT");
   const goToCurrent = () => onNavigate("TODAY");
   const handleViewChange = (newView) => onView(newView);
 
-  // ✅ La magia para la animación automática
+  // Efecto para la animación deslizante (solo en escritorio)
   useEffect(() => {
+    // Si es móvil, no calculamos la animación
+    if (isMobile) return;
+
     const groupElement = viewBtnGroupRef.current;
     if (!groupElement) return;
 
@@ -23,7 +33,7 @@ export const CalendarToolbar = ({ label, onNavigate, onView, view }) => {
 
     groupElement.style.setProperty("--left", `${offsetLeft}px`);
     groupElement.style.setProperty("--width", `${offsetWidth}px`);
-  }, [view]); // Se ejecuta cada vez que la 'view' cambia
+  }, [view, isMobile]); // Se re-ejecuta si 'view' o 'isMobile' cambian
 
   return (
     <div className="custom-toolbar-container">
@@ -43,32 +53,38 @@ export const CalendarToolbar = ({ label, onNavigate, onView, view }) => {
 
       {/* Sección Derecha: Vistas */}
       <div className="toolbar-section-right">
-        {/* ✅ Añadimos la referencia aquí */}
-        <div ref={viewBtnGroupRef} className="view-btn-group">
-          <button
-            className={view === "month" ? "active" : ""}
-            onClick={() => handleViewChange("month")}
-          >
-            Mes
-          </button>
-          <button
-            className={view === "week" ? "active" : ""}
-            onClick={() => handleViewChange("week")}
-          >
-            Semana
-          </button>
+        {/* --- Añade la clase 'is-mobile' dinámicamente --- */}
+        <div
+          ref={viewBtnGroupRef}
+          className={`view-btn-group ${isMobile ? "is-mobile" : ""}`}
+        >
+          {/* --- Oculta botones "Mes" y "Semana" si 'isMobile' es true --- */}
+          {!isMobile && (
+            <>
+              <button
+                className={view === "month" ? "active" : ""}
+                onClick={() => handleViewChange("month")}
+              >
+                Mes
+              </button>
+              <button
+                className={view === "week" ? "active" : ""}
+                onClick={() => handleViewChange("week")}
+              >
+                Semana
+              </button>
+            </>
+          )}
+
+          {/* Estas vistas SÍ se muestran en móvil */}
           <button
             className={view === "day" ? "active" : ""}
             onClick={() => handleViewChange("day")}
           >
             Día
           </button>
-          <button
-            className={view === "agenda" ? "active" : ""}
-            onClick={() => handleViewChange("agenda")}
-          >
-            Agenda
-          </button>
+
+          {/* (El botón "Agenda" lo quitamos, como acordamos) */}
         </div>
       </div>
     </div>
