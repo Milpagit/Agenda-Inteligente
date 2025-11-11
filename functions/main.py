@@ -850,12 +850,12 @@ def get_proactive_alerts(req: https_fn.Request) -> https_fn.Response:
                 
                 # --- ✅ LÓGICA FINAL (MODO PRUEBA DESACTIVADO) ---
                 
-                if risk_score > 0.7: # Riesgo Muy Alto
+                if risk_score > 0.5: # Riesgo Muy Alto
                     insistencia = "alta"
                     texto = f"¡MUCHO OJO, {user_name}! Tienes '{event_title_original}' pronto. ¡Es crucial que empieces a prepararte ya!"
                     alerts_to_send.append({'text': texto, 'insistencia': insistencia})
                 
-                elif risk_score > 0.5: # Riesgo Medio
+                elif risk_score > 0.3: # Riesgo Medio
                     insistencia = "media"
                     texto = f"Hola, {user_name}, solo un recordatorio proactivo: Tienes '{event_title_original}' esta semana. ¿Ya tienes un plan de estudio para esto?"
                     alerts_to_send.append({'text': texto, 'insistencia': insistencia})
