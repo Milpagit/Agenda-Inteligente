@@ -1,11 +1,10 @@
-// src/calendar/components/SubjectsModal.jsx
 import { useState } from "react";
 import Modal from "react-modal";
 import DatePicker, { registerLocale } from "react-datepicker";
 import es from "date-fns/locale/es";
 import Swal from "sweetalert2";
-import importApi from "../../api/importApi"; // Usa la API correcta
-import { getAuth } from "firebase/auth"; // <-- Importar getAuth
+import importApi from "../../api/importApi";
+import { getAuth } from "firebase/auth";
 import {
   useUiStore,
   useSubjectStore,
@@ -19,7 +18,6 @@ import "./SubjectsModal.css";
 
 registerLocale("es", es);
 
-// Paleta de colores
 const presetColors = [
   "#46487A",
   "#7786C6",
@@ -33,7 +31,12 @@ const presetColors = [
   "#343A40",
 ];
 
+const MAX_SUBJECT_NAME_LENGTH = 60;
+const MAX_IMPORT_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const subjectFormFields = { name: "", color: presetColors[0] };
+
+const isAllowedImportFile = (file) =>
+  file.type === "application/pdf" || file.type.startsWith("image/");
 
 const customStyles = {
   content: {
@@ -63,10 +66,38 @@ export const SubjectsModal = () => {
 
   const handleNewSubjectSubmit = (event) => {
     event.preventDefault();
-    if (name.trim().length <= 1) return;
-    startSavingSubject({ name, color });
+
+    const normalizedName = name.trim();
+    if (
+      normalizedName.length < 2 ||
+      normalizedName.length > MAX_SUBJECT_NAME_LENGTH
+    ) {
+      Swal.fire(
+        "Datos inválidos",
+        `El nombre de la materia debe tener entre 2 y ${MAX_SUBJECT_NAME_LENGTH} caracteres.`,
+        "warning",
+      );
+      return;
+    }
+
+    const isDuplicate = subjects.some(
+      (subject) =>
+        subject.name.trim().toLowerCase() === normalizedName.toLowerCase(),
+    );
+
+    if (isDuplicate) {
+      Swal.fire(
+        "Datos inválidos",
+        "Ya tienes una materia con ese nombre.",
+        "warning",
+      );
+      return;
+    }
+
+    startSavingSubject({ name: normalizedName, color });
     onResetForm();
   };
+
   const handleColorClick = (selectedColor) => {
     const fakeEvent = { target: { name: "color", value: selectedColor } };
     onInputChange(fakeEvent);
@@ -95,57 +126,73 @@ export const SubjectsModal = () => {
       return;
     }
 
+    if (!isAllowedImportFile(selectedFile)) {
+      Swal.fire(
+        "Archivo no válido",
+        "El archivo debe ser PDF o imagen.",
+        "warning",
+      );
+      return;
+    }
+
+    if (selectedFile.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+      Swal.fire(
+        "Archivo muy grande",
+        "El tamaño máximo permitido es de 10 MB.",
+        "warning",
+      );
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedEndDate = new Date(endDate);
+    selectedEndDate.setHours(0, 0, 0, 0);
+
+    if (selectedEndDate < today) {
+      Swal.fire(
+        "Fecha no válida",
+        "La fecha de fin no puede ser anterior a hoy.",
+        "warning",
+      );
+      return;
+    }
+
     setIsImporting(true);
     Swal.fire({
       title: "Importando...",
       text: "Puede tardar... No cierres esta ventana.",
       allowOutsideClick: false,
-      showConfirmButton: false, // 1. Ocultamos el botón que causa el error
+      showConfirmButton: false,
       didOpen: () => {
-        Swal.showLoading(); // 2. Llamamos al loader manualmente
+        Swal.showLoading();
       },
     });
 
     try {
-      // --- Obtener token fresco ---
       const auth = getAuth();
       const user = auth.currentUser;
       if (!user) {
         throw new Error("No hay usuario autenticado. Inicia sesión.");
       }
-      const token = await user.getIdToken(true); // Token fresco
-      console.log(
-        "[handleImportSubmit] Fresh ID Token obtained:",
-        token ? token.substring(0, 20) + "..." : "null"
-      );
-      // --- Fin Obtener Token ---
+      const token = await user.getIdToken(true);
 
       const fileBase64 = await readFileAsBase64(selectedFile);
-      // --- Enviar payload como JSON ---
       const payload = {
         fileData: fileBase64,
         endDate: endDate.toISOString(),
         fileType: selectedFile.type,
       };
-      console.log("Payload being sent (JSON):", {
-        ...payload,
-        fileData: payload.fileData.substring(0, 50) + "...",
-      });
-      // --- Fin Enviar JSON ---
 
-      // --- Llamar a importApi con ruta vacía y token en header ---
       await importApi.post("", payload, {
-        // <-- Ruta vacía ''
         headers: {
-          Authorization: `Bearer ${token}`, // Enviar token fresco
+          Authorization: `Bearer ${token}`,
         },
       });
-      // --- Fin Llamada ---
 
       Swal.fire("¡Éxito!", "Horario importado.", "success");
       startLoadingEvents();
       setSelectedFile(null);
-      // closeSubjectsModal();
     } catch (error) {
       console.error("Error al importar horario:", error);
       const backendError = error.response?.data?.error;
@@ -155,10 +202,6 @@ export const SubjectsModal = () => {
           ? "Error de red o CORS. Verifica los logs del servidor."
           : error.message) ||
         "No se pudo procesar el archivo.";
-      // Añadir log específico para CORS
-      if (error.code === "ERR_NETWORK" || error.message.includes("CORS")) {
-        console.error("CORS Error Detail:", error);
-      }
       Swal.fire("Error", displayError, "error");
     } finally {
       setIsImporting(false);
@@ -179,7 +222,6 @@ export const SubjectsModal = () => {
       </div>
       <hr />
       <div className="subjects-container">
-        {/* --- Sección: Importar Horario --- */}
         <div className="import-schedule-section">
           <h5>Importar Horario desde Archivo</h5>
           <form onSubmit={handleImportSubmit}>
@@ -223,7 +265,6 @@ export const SubjectsModal = () => {
             </button>
           </form>
         </div>
-        {/* --- Sección: Añadir Materia Manualmente --- */}
         <div className="add-subject-section">
           <h5>Añadir Materia Manualmente</h5>
           <form className="add-subject-form" onSubmit={handleNewSubjectSubmit}>
@@ -237,6 +278,7 @@ export const SubjectsModal = () => {
                 name="name"
                 value={name}
                 onChange={onInputChange}
+                maxLength={MAX_SUBJECT_NAME_LENGTH}
               />
             </div>
             <div className="form-group-color">
@@ -257,29 +299,25 @@ export const SubjectsModal = () => {
               </div>
             </div>
             <button type="submit" className="btn btn-primary btn-add-subject">
-              {" "}
-              Añadir Materia Manual{" "}
+              Añadir Materia Manual
             </button>
           </form>
         </div>
-        {/* --- Sección: Lista de Materias Existentes --- */}
         <h5>Mis Materias</h5>
         <ul className="subjects-list">
           {subjects.map((subject) => (
             <li key={subject.id} className="subject-item">
-              {" "}
               <span
                 className="subject-color-dot"
                 style={{ backgroundColor: subject.color }}
-              ></span>{" "}
-              <span className="subject-name">{subject.name}</span>{" "}
+              ></span>
+              <span className="subject-name">{subject.name}</span>
               <button
                 className="delete-btn"
                 onClick={() => startDeletingSubject(subject.id)}
               >
-                {" "}
-                &times;{" "}
-              </button>{" "}
+                &times;
+              </button>
             </li>
           ))}
           {subjects.length === 0 && (

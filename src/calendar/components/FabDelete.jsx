@@ -6,12 +6,7 @@ export const FabDelete = () => {
   const { isDateModalOpen } = useUiStore();
   const { user } = useAuthStore();
 
-  // --- CORRECCIÓN 1.1: Lógica de propiedad unificada ---
-  // Se comprueba 'user.uid' tanto del 'user' autenticado como del 'activeEvent.user'.
-  // Ahora funcionará tanto para eventos manuales ({uid: '...'})
-  // como para eventos importados ({uid: '...'} <- corregido en main.py).
   const isMyEvent = user?.uid === activeEvent?.user?.uid;
-  // --- Fin CORRECCIÓN 1.1 ---
 
   const handleDelete = () => {
     if (!activeEvent) return;

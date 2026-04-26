@@ -116,7 +116,9 @@
   height: 100%;
   border-radius: 6px;
   /* La transición hace que se anime suavemente */
-  transition: width 0.5s ease-out, background-color 0.5s ease;
+  transition:
+    width 0.5s ease-out,
+    background-color 0.5s ease;
 }
 
 /* La etiqueta de texto (Bajo, Medio, Alto) */
@@ -167,11 +169,8 @@
   content: attr(data-tooltip); /* Toma el texto del atributo HTML */
   position: absolute;
   bottom: 125%; /* Se posiciona 125% arriba del '?' */
-
-  /* --- ✅ CORRECCIÓN DE POSICIÓN --- */
   left: 0; /* Anclamos el tooltip al borde IZQUIERDO del '?' */
   transform: translateX(0); /* NO lo centramos horizontalmente */
-  /* --- FIN CORRECCIÓN --- */
 
   background-color: #333;
   color: white;
@@ -180,12 +179,8 @@
   font-size: 13px;
   font-weight: 500;
   text-align: left;
-
-  /* --- ✅ CORRECCIÓN DE ANCHO --- */
-  /* Lo hacemos un poco más angosto que la sidebar para que quepa */
   width: 230px;
   white-space: normal; /* Permite que el texto baje de línea */
-  /* --- FIN CORRECCIÓN --- */
 
   z-index: 10;
 
@@ -202,12 +197,8 @@
   content: "";
   position: absolute;
   bottom: 100%; /* Justo entre el '?' y el cuadro */
-
-  /* --- ✅ CORRECCIÓN DE FLECHA --- */
-  /* Lo centramos sobre el icono '?' (que mide 16px) */
   left: 8px;
   transform: translateX(-50%); /* Centramos la flecha sobre el '?' */
-  /* --- FIN CORRECCIÓN --- */
 
   border-width: 5px;
   border-style: solid;

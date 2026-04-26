@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const alertsApiURL =
-  "https://us-central1-agenda-b616a.cloudfunctions.net/get_proactive_alerts";
+const alertsApiURL = process.env.REACT_APP_ALERTS_API_URL;
 
 const alertsApi = axios.create({
   baseURL: alertsApiURL,

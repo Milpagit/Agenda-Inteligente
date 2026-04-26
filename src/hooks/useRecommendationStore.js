@@ -19,7 +19,7 @@ import {
 export const useRecommendationStore = () => {
   const dispatch = useDispatch();
   const { activeRecommendation } = useSelector(
-    (state) => state.recommendations
+    (state) => state.recommendations,
   );
   const { user } = useSelector((state) => state.auth);
 
@@ -27,27 +27,24 @@ export const useRecommendationStore = () => {
     if (!user.uid) return;
 
     try {
-      // 1. Buscar primero alertas de riesgo no vistas en Firestore
       const recommendationsRef = collection(
         FirebaseDB,
-        `users/${user.uid}/recommendations`
+        `users/${user.uid}/recommendations`,
       );
       const q = query(recommendationsRef, where("viewed", "==", false));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Si encontramos una alerta, la mostramos
         const firstAlert = querySnapshot.docs[0];
         const recommendation = {
           id: firstAlert.id,
           text: firstAlert.data().text,
           action: null,
-        }; // Las alertas de riesgo no tienen acción por ahora
+        };
         dispatch(onLoadRecommendation(recommendation));
-        return; // Nos detenemos aquí
+        return;
       }
 
-      // 2. Si no hay alertas, dar un consejo general basado en el perfil
       if (user.cluster !== undefined) {
         const recommendationObject = getRecommendationForProfile(user.cluster);
         const recommendation = { id: null, ...recommendationObject };
@@ -62,32 +59,26 @@ export const useRecommendationStore = () => {
     async (recommendation) => {
       if (!recommendation) return;
 
-      // Oculta la recomendación de la UI inmediatamente
       dispatch(onDismissRecommendation());
 
-      // Si la recomendación tiene un ID, significa que vino de Firestore
-      // y debemos marcarla como "vista" para que no vuelva a aparecer.
       if (recommendation.id && user.uid) {
         try {
           const docRef = doc(
             FirebaseDB,
-            `users/${user.uid}/recommendations/${recommendation.id}`
+            `users/${user.uid}/recommendations/${recommendation.id}`,
           );
           await updateDoc(docRef, { viewed: true });
-          console.log("Alerta de riesgo marcada como vista.");
         } catch (error) {
           console.error("Error al actualizar la recomendación:", error);
         }
       }
     },
-    [user.uid, dispatch]
+    [user.uid, dispatch],
   );
 
   return {
-    // Propiedades
     activeRecommendation,
 
-    // Métodos
     startLoadingRecommendation,
     dismissRecommendation,
   };

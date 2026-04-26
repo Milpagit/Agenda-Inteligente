@@ -1,5 +1,3 @@
-// src/hooks/useCalendarStore.js
-
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback } from "react";
 import Swal from "sweetalert2";
@@ -30,53 +28,50 @@ export const useCalendarStore = () => {
     (calendarEvent) => {
       dispatch(onSetActiveEvent(calendarEvent));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const startSavingEvent = useCallback(
     async (calendarEvent) => {
       if (!user.uid) return;
 
-      // ✅ Preparamos el evento para guardarlo, asegurando que 'subject' esté incluido.
       const eventToSave = {
         title: calendarEvent.title,
         notes: calendarEvent.notes,
         start: calendarEvent.start,
         end: calendarEvent.end,
         user: { uid: user.uid, name: user.name },
-        subject: calendarEvent.subject || null, // Guarda el objeto de materia o null si no hay
+        subject: calendarEvent.subject || null,
       };
 
       try {
         if (calendarEvent.id) {
-          // Actualizando un evento existente
           const docRef = doc(
             FirebaseDB,
-            `users/${user.uid}/events/${calendarEvent.id}`
+            `users/${user.uid}/events/${calendarEvent.id}`,
           );
           await updateDoc(docRef, eventToSave);
           dispatch(onUpdateEvent({ ...calendarEvent }));
           Swal.fire(
             "Actualizado",
             "El evento ha sido actualizado con éxito",
-            "success"
+            "success",
           );
           return;
         }
 
-        // Creando un nuevo evento
         const docRef = await addDoc(
           collection(FirebaseDB, `users/${user.uid}/events`),
-          eventToSave
+          eventToSave,
         );
         dispatch(onAddNewEvent({ ...eventToSave, id: docRef.id }));
         Swal.fire("Creado", "El evento ha sido creado con éxito", "success");
       } catch (error) {
-        console.log("error", error);
+        console.error("Error al guardar evento:", error);
         Swal.fire("Error al guardar", error.message, "error");
       }
     },
-    [user.uid, dispatch]
+    [user.uid, dispatch],
   );
 
   const startDeletingEvent = useCallback(async () => {
@@ -84,14 +79,14 @@ export const useCalendarStore = () => {
     try {
       const docRef = doc(
         FirebaseDB,
-        `users/${user.uid}/events/${activeEvent.id}`
+        `users/${user.uid}/events/${activeEvent.id}`,
       );
       await deleteDoc(docRef);
       dispatch(onDeleteEvent());
       Swal.fire(
         "Eliminado",
         "El evento ha sido eliminado con éxito",
-        "success"
+        "success",
       );
     } catch (error) {
       Swal.fire("Error al eliminar", error.message, "error");
@@ -110,7 +105,7 @@ export const useCalendarStore = () => {
       const events = convertEventsToDateEvents(eventsFromDB);
       dispatch(onLoadEvents(events));
     } catch (error) {
-      console.log("Error cargando eventos", error);
+      console.error("Error cargando eventos:", error);
     }
   }, [user.uid, dispatch]);
 

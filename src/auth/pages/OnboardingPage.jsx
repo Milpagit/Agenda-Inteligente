@@ -3,10 +3,9 @@ import { useState } from "react";
 import { useAuthStore, useForm } from "../../hooks";
 import functionsApi from "../../api/functionsApi";
 import Swal from "sweetalert2";
-import { getAuth } from "firebase/auth"; // <-- La importación que añadimos
+import { getAuth } from "firebase/auth";
 import "./OnboardingPage.css";
 
-// Define el estado inicial para todas las preguntas del formulario
 const onboardingFormFields = {
   edad: "",
   genero: "Prefiero no decir",
@@ -34,11 +33,9 @@ export const OnboardingPage = () => {
   const { startSavingOnboardingProfile } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- ESTA ES LA LÓGICA CORREGIDA ---
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validar que los campos numéricos no estén vacíos
     if (
       formState.edad.trim() === "" ||
       formState.promedioEstudio.trim() === "" ||
@@ -47,7 +44,7 @@ export const OnboardingPage = () => {
       Swal.fire(
         "Campos incompletos",
         "Por favor, llena todos los campos.",
-        "error"
+        "error",
       );
       return;
     }
@@ -55,7 +52,6 @@ export const OnboardingPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Obtenemos la instancia de Auth y el token FRESCO
       const auth = getAuth();
       const user = auth.currentUser;
 
@@ -63,38 +59,32 @@ export const OnboardingPage = () => {
         throw new Error("No se encontró un usuario autenticado.");
       }
 
-      const token = await user.getIdToken(true); // Token fresco
+      const token = await user.getIdToken(true);
 
-      // Llamamos a la API (Cloud Function) enviando el token en los headers
-      console.log("Enviando datos al modelo (con token)...");
       const { data } = await functionsApi.post(
         "",
         { data: formState },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // El header de autenticación
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const { cluster } = data;
-      console.log(`✅ ¡Modelo predijo el clúster: ${cluster}!`);
       await startSavingOnboardingProfile(formState, cluster);
     } catch (error) {
       console.error("Error al contactar el modelo:", error);
       Swal.fire(
         "Error del Modelo",
         "No se pudo predecir tu perfil. Revisa los datos o contacta al administrador.",
-        "error"
+        "error",
       );
     }
 
     setIsSubmitting(false);
   };
-  // --- FIN DE LA LÓGICA CORREGIDA ---
 
-  // --- ESTE ES EL FORMULARIO QUE BORRÉ ACCIDENTALMENTE ---
-  // --- AHORA ESTÁ RESTAURADO ---
   return (
     <div className="onboarding-container">
       <div className="onboarding-form">
@@ -364,12 +354,12 @@ export const OnboardingPage = () => {
             </div>
           </div>
 
-          {/* --- Sección 4: Bienestar Emocional (Corregida) --- */}
+          {/* --- Sección 4: Bienestar Emocional --- */}
           <h3>Bienestar Emocional</h3>
           <div className="form-section full-width-section">
             <div className="form-group slider-group">
               <div className="slider-label-container">
-                <label>Como calificarías tu salud mental (1-10)</label>
+                <label>¿Cómo calificarías tu salud mental (1-10)?</label>
                 <b className="slider-value">{formState.saludMental}</b>
               </div>
               <div className="slider-wrapper">
@@ -427,7 +417,6 @@ export const OnboardingPage = () => {
             </div>
           </div>
 
-          {/* */}
           <button
             type="submit"
             className="btn btn-primary submit-btn"
@@ -440,6 +429,3 @@ export const OnboardingPage = () => {
     </div>
   );
 };
-{
-  /* --- FIN DEL FORMULARIO --- */
-}

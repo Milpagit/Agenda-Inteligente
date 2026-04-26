@@ -79,8 +79,6 @@
   z-index: 0;
 }
 
-/* --- ✅ INICIO DE LA CORRECCIÓN RESPONSIVE --- */
-
 /* Se aplica en pantallas de 768px o menos (móviles) */
 @media (max-width: 768px) {
   .custom-toolbar-container {
@@ -136,4 +134,3 @@
     color: white;
   }
 }
-/* --- ✅ FIN DE LA CORRECCIÓN RESPONSIVE --- */

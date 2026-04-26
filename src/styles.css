@@ -48,23 +48,22 @@
   width: 70px;
   height: 70px;
   position: fixed;
-  right: 25px; /* ✅ ASEGÚRATE DE QUE ESTA LÍNEA DICE 'right' */
+  right: 25px;
   box-shadow: var(--shadow-medium);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   z-index: 100;
 }
 
 .fab-danger {
   border-radius: 100%;
-  /* --- CORRECCIÓN --- */
-  /* Lo movemos arriba del botón azul (+), 70px de alto + 15px de espacio */
   bottom: 110px;
   font-size: 22px;
   width: 70px;
   height: 70px;
   position: fixed;
-  right: 25px; /* <-- Cambiado de 'left' a 'right' */
-  /* --- FIN CORRECCIÓN --- */
+  right: 25px;
   box-shadow: var(--shadow-medium);
 }
 
@@ -91,7 +90,8 @@ body,
   margin: 0;
   padding: 0;
   /* Fuente moderna, preferiblemente una de Google Fonts si la quieres exacta */
-  font-family: "Inter", sans-serif; /* Puedes elegir otra, como Roboto, Open Sans, etc. */
+  font-family:
+    "Inter", sans-serif; /* Puedes elegir otra, como Roboto, Open Sans, etc. */
   background-color: #f8f9fa; /* Un fondo muy claro */
   color: #333;
 }
@@ -125,7 +125,9 @@ body,
   /* Inicialmente oculto */
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
+  transition:
+    opacity 0.2s,
+    visibility 0.2s;
 }
 
 /* El pequeño triángulo/flecha */
@@ -142,7 +144,9 @@ body,
   /* Inicialmente oculto */
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
+  transition:
+    opacity 0.2s,
+    visibility 0.2s;
 }
 
 /* Muestra el tooltip al pasar el mouse sobre el FAB */

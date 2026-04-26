@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile, // <-- 1. IMPORTAR updateProfile
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore/lite";
 import { FirebaseAuth, FirebaseDB } from "../firebase/config";
@@ -30,20 +30,15 @@ export const useAuthStore = () => {
         return;
       }
 
-      // Abre el "expediente" del usuario en Firestore
       const userDocRef = doc(FirebaseDB, `users/${user.uid}`);
       const userDocSnap = await getDoc(userDocRef);
 
-      // --- ✅ INICIO DE LA CORRECCIÓN ---
-      // Leemos todos los datos del perfil de Firestore
       const onboardingComplete =
         userDocSnap.exists() && userDocSnap.data().onboardingComplete;
       const cluster = userDocSnap.exists() ? userDocSnap.data().cluster : null;
-      // Añadimos el riskScore (con un valor por defecto si no existe)
       const riskScore = userDocSnap.exists()
         ? userDocSnap.data().riskScore
         : 0.3;
-      // --- ✅ FIN DE LA CORRECCIÓN ---
 
       const { uid, displayName, email } = user;
 
@@ -53,8 +48,8 @@ export const useAuthStore = () => {
           uid: uid,
           onboardingComplete,
           cluster,
-          riskScore, // <-- ✅ AÑADIDO
-        })
+          riskScore,
+        }),
       );
     });
 
@@ -62,7 +57,6 @@ export const useAuthStore = () => {
   }, [dispatch]);
 
   const startLogin = async ({ email, password }) => {
-    // ... (Esta función está bien, no cambia)
     dispatch(onChecking());
     try {
       await signInWithEmailAndPassword(FirebaseAuth, email, password);
@@ -75,35 +69,30 @@ export const useAuthStore = () => {
   const startRegister = async ({ name, email, password }) => {
     dispatch(onChecking());
     try {
-      // 1. Crea el usuario
       const resp = await createUserWithEmailAndPassword(
         FirebaseAuth,
         email,
-        password
+        password,
       );
       const { uid } = resp.user;
 
-      // 2. Actualiza el perfil de AUTH con el nombre
       await updateProfile(FirebaseAuth.currentUser, { displayName: name });
 
-      // 3. CREA el documento inicial en FIRESTORE
       const userDocRef = doc(FirebaseDB, `users/${uid}`);
       const newProfile = {
         onboardingComplete: false,
         cluster: null,
-        onboardingData: {}, // Lo dejamos vacío por ahora
+        onboardingData: {},
       };
       await setDoc(userDocRef, newProfile);
 
-      // 4. Loguea al usuario en Redux (el listener onAuthStateChanged
-      //    también lo hará, pero esto es más rápido e inmediato)
       dispatch(
         onLogin({
           name: name,
           uid: uid,
           onboardingComplete: false,
           cluster: null,
-        })
+        }),
       );
     } catch (error) {
       dispatch(onLogout(error.message));
@@ -112,7 +101,6 @@ export const useAuthStore = () => {
   };
 
   const startSavingOnboardingProfile = async (onboardingData, cluster) => {
-    // ... (Esta función está bien, pero setDoc debe ser 'merge' para no borrar lo anterior)
     if (!user.uid) return;
     dispatch(onChecking());
     try {
@@ -122,8 +110,6 @@ export const useAuthStore = () => {
         cluster: cluster === undefined ? null : cluster,
         onboardingComplete: true,
       };
-      // --- 3. CORRECCIÓN: Usar { merge: true } ---
-      // Esto asegura que actualizamos el doc sin borrar otros campos
       await setDoc(userDocRef, profileData, { merge: true });
       dispatch(onLogin({ ...user, ...profileData }));
     } catch (error) {
@@ -133,19 +119,16 @@ export const useAuthStore = () => {
   };
 
   const startLogout = async () => {
-    // ... (Esta función está bien, no cambia)
     await signOut(FirebaseAuth);
     dispatch(onLogoutCalendar());
     dispatch(onLogout());
   };
 
   return {
-    // * Propiedades
     status,
     user,
     errorMessage,
 
-    // * Métodos
     startLogin,
     startLogout,
     startRegister,

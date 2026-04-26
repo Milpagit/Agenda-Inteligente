@@ -1,11 +1,19 @@
-// src/hooks/useForm.js
-
 import { useEffect, useMemo, useState } from "react";
+
+const areFormValuesEqual = (currentForm, nextForm) => {
+  const currentKeys = Object.keys(currentForm);
+  const nextKeys = Object.keys(nextForm);
+
+  if (currentKeys.length !== nextKeys.length) {
+    return false;
+  }
+
+  return nextKeys.every((key) => currentForm[key] === nextForm[key]);
+};
 
 export const useForm = (initialForm = {}, formValidations = {}) => {
   const [formState, setFormState] = useState(initialForm);
 
-  // ✅ Cálculo de validaciones, solo se recalcula si formState cambia
   const formValidation = useMemo(() => {
     const formCheckedValues = {};
     for (const formField of Object.keys(formValidations)) {
@@ -17,14 +25,12 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     return formCheckedValues;
   }, [formState, formValidations]);
 
-  // ✅ Evita el bucle infinito: solo actualiza si realmente cambia el contenido
   useEffect(() => {
-    if (JSON.stringify(formState) !== JSON.stringify(initialForm)) {
-      setFormState(initialForm);
-    }
-  }, [initialForm]); // Se ejecuta solo cuando initialForm cambia realmente
+    setFormState((currentForm) =>
+      areFormValuesEqual(currentForm, initialForm) ? currentForm : initialForm
+    );
+  }, [initialForm]);
 
-  // ✅ Determina si el formulario es válido
   const isFormValid = useMemo(() => {
     for (const formValue of Object.keys(formValidation)) {
       if (formValidation[formValue] !== null) return false;
@@ -32,7 +38,6 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     return true;
   }, [formValidation]);
 
-  // ✅ Manejo de cambios en los inputs
   const onInputChange = ({ target }) => {
     const { name, value } = target;
     setFormState({
@@ -41,7 +46,6 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     });
   };
 
-  // ✅ Reinicia el formulario
   const onResetForm = () => {
     setFormState(initialForm);
   };

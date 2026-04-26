@@ -107,8 +107,6 @@
   flex-grow: 1;
 }
 
-/* --- ✅ INICIO DE LA CORRECCIÓN RESPONSIVE --- */
-
 /* Estas reglas se aplican en pantallas de 768px o menos (tablets y móviles) */
 @media (max-width: 768px) {
   .onboarding-form {
@@ -120,4 +118,3 @@
     grid-template-columns: 1fr;
   }
 }
-/* --- ✅ FIN DE LA CORRECCIÓN RESPONSIVE --- */

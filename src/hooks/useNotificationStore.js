@@ -4,12 +4,12 @@ import {
   onLoadAlerts,
   onCloseAlertsModal,
 } from "../store/notifications/notificationSlice";
-import alertsApi from "../api/alertsApi"; // <-- (Este es el que tendrías que crear)
+import alertsApi from "../api/alertsApi";
 
 export const useNotificationStore = () => {
   const dispatch = useDispatch();
   const { proactiveAlerts, isModalOpen } = useSelector(
-    (state) => state.notifications
+    (state) => state.notifications,
   );
 
   const startLoadingAlerts = async () => {
@@ -21,7 +21,6 @@ export const useNotificationStore = () => {
       const token = await user.getIdToken(true);
 
       const { data } = await alertsApi.get("", {
-        // Hacemos un GET
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -36,10 +35,8 @@ export const useNotificationStore = () => {
   };
 
   return {
-    // Propiedades
     proactiveAlerts,
     isModalOpen,
-    // Métodos
     startLoadingAlerts,
     closeAlertsModal,
   };

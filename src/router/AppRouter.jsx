@@ -1,5 +1,3 @@
-// src/router/AppRouter.jsx
-
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage, OnboardingPage } from "../auth";
 import { CalendarPage } from "../calendar";
@@ -20,9 +18,7 @@ export const AppRouter = () => {
           <Route path="/auth/*" element={<LoginPage />} />
           <Route path="/*" element={<Navigate to={"/auth/login"} />} />
         </>
-      ) : // ✅ LA CORRECCIÓN ESTÁ AQUÍ
-      // Primero preguntamos si 'user' existe, y LUEGO si 'onboardingComplete' es falso.
-      !user || !user.onboardingComplete ? (
+      ) : !user || !user.onboardingComplete ? (
         <>
           <Route path="/auth/onboarding" element={<OnboardingPage />} />
           <Route path="/*" element={<Navigate to="/auth/onboarding" />} />

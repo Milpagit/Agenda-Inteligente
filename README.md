@@ -10,37 +10,37 @@ This project is a sophisticated frontend calendar application (`calendar-app`) d
 
 The following technologies and tools are used in this project:
 
-| Technology          | Category            | Notes                                                                                               |
-| :------------------ | :------------------ | :-------------------------------------------------------------------------------------------------- |
-| JavaScript          | Language            | Primary language for frontend development.                                                          |
-| React               | Frontend Framework  | For building dynamic and interactive user interfaces.                                               |
-| Redux Toolkit       | State Management    | Efficient global state management.                                                                  |
-| Axios               | HTTP Client         | For making API requests to the backend.                                                             |
-| Firebase            | Backend Service     | Likely used for authentication, real-time database, or other backend functionalities.               |
-| React Big Calendar  | UI Component        | Provides a flexible and feature-rich calendar view.                                                 |
-| React Datepicker    | UI Component        | For intuitive date selection in forms.                                                              |
-| Sweetalert2         | UI Component        | For customizable and responsive alert messages.                                                     |
-| Jest                | Testing Framework   | For unit and integration testing of JavaScript code.                                                |
-| Babel               | Transpiler          | Compiles modern JavaScript code for broader browser compatibility.                                  |
-| CSS                 | Styling             | For styling the application's user interface.                                                       |
-| HTML                | Markup Language     | For structuring the web content.                                                                    |
-| Python              | Language (Detected) | Detected as part of the repository, but not a primary dependency in this frontend `package.json`.   |
-| Java                | Language (Detected) | Detected as part of the repository, but not a primary dependency in this frontend `package.json`.   |
+| Technology         | Category            | Notes                                                                                             |
+| :----------------- | :------------------ | :------------------------------------------------------------------------------------------------ |
+| JavaScript         | Language            | Primary language for frontend development.                                                        |
+| React              | Frontend Framework  | For building dynamic and interactive user interfaces.                                             |
+| Redux Toolkit      | State Management    | Efficient global state management.                                                                |
+| Axios              | HTTP Client         | For making API requests to the backend.                                                           |
+| Firebase           | Backend Service     | Likely used for authentication, real-time database, or other backend functionalities.             |
+| React Big Calendar | UI Component        | Provides a flexible and feature-rich calendar view.                                               |
+| React Datepicker   | UI Component        | For intuitive date selection in forms.                                                            |
+| Sweetalert2        | UI Component        | For customizable and responsive alert messages.                                                   |
+| Jest               | Testing Framework   | For unit and integration testing of JavaScript code.                                              |
+| Babel              | Transpiler          | Compiles modern JavaScript code for broader browser compatibility.                                |
+| CSS                | Styling             | For styling the application's user interface.                                                     |
+| HTML               | Markup Language     | For structuring the web content.                                                                  |
+| Python             | Language (Detected) | Detected as part of the repository, but not a primary dependency in this frontend `package.json`. |
+| Java               | Language (Detected) | Detected as part of the repository, but not a primary dependency in this frontend `package.json`. |
 
 ## Features
 
-*   **User Authentication:** Secure user registration and login to access personalized calendar functionalities.
-*   **Detailed Calendar Views:** Offers multiple views including Agenda, Daily, Weekly, and Monthly to visualize events.
-*   **Event Management:** Users can add, edit, and remove their own events, including specific dates, times, and descriptions.
-*   **Cross-User Event Visibility:** Allows users to view events created by other individuals, facilitating group coordination and planning.
+- **User Authentication:** Secure user registration and login to access personalized calendar functionalities.
+- **Detailed Calendar Views:** Offers multiple views including Agenda, Daily, Weekly, and Monthly to visualize events.
+- **Event Management:** Users can add, edit, and remove their own events, including specific dates, times, and descriptions.
+- **Cross-User Event Visibility:** Allows users to view events created by other individuals, facilitating group coordination and planning.
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-*   **Node.js**: A JavaScript runtime environment. (Version implied by `package.json` dependencies).
-*   **npm** (Node Package Manager) or **Yarn/pnpm**: For managing project dependencies.
-*   **Backend API**: This frontend application requires a compatible backend API to function correctly. A Node.js, Express, and MongoDB backend is mentioned as a companion. Ensure it is running and accessible.
+- **Node.js**: A JavaScript runtime environment. (Version implied by `package.json` dependencies).
+- **npm** (Node Package Manager) or **Yarn/pnpm**: For managing project dependencies.
+- **Backend API**: This frontend application requires a compatible backend API to function correctly. A Node.js, Express, and MongoDB backend is mentioned as a companion. Ensure it is running and accessible.
 
 ## Installation
 
@@ -55,14 +55,27 @@ Follow these steps to set up and run the project locally:
     cd Agenda-Inteligente
     ```
 3.  **Rename the environment file:**
-    Rename `.env.template` to `.env`.
+    Copy `.env.template` to `.env`.
     ```bash
-    mv .env.template .env
+    cp .env.template .env
+    ```
+    On Windows PowerShell:
+    ```powershell
+    Copy-Item .env.template .env
     ```
 4.  **Configure environment variables:**
-    Open the newly created `.env` file and replace the placeholder value for `REACT_APP_API_URL` with the URL of your running backend API.
+    Open the newly created `.env` file and complete all required variables:
     ```
     REACT_APP_API_URL="http://localhost:4000/api"
+    REACT_APP_FUNCTIONS_API_URL="https://<your-cloud-run-url>"
+    REACT_APP_IMPORT_SCHEDULE_API_URL="https://<your-cloud-run-url>"
+    REACT_APP_ALERTS_API_URL="https://<your-cloud-function-url>"
+    REACT_APP_APIKEY="<firebase-api-key>"
+    REACT_APP_AUTHDOMAIN="<firebase-auth-domain>"
+    REACT_APP_PROJECTID="<firebase-project-id>"
+    REACT_APP_STORAGEBUCKET="<firebase-storage-bucket>"
+    REACT_APP_MESSAGINGSENDERID="<firebase-messaging-sender-id>"
+    REACT_APP_APPID="<firebase-app-id>"
     ```
 5.  **Install dependencies:**
     ```bash
@@ -77,16 +90,16 @@ To start the development server and run the application:
 npm start
 ```
 
-This command will launch the application in development mode. Open [http://localhost:3000](http://localhost:3000) (or the port indicated in your console) to view it in your browser. Ensure your backend API is running and accessible at the `REACT_APP_API_URL` specified in your `.env` file for full functionality.
+This command will launch the application in development mode. Open [http://localhost:3000](http://localhost:3000) (or the port indicated in your console) to view it in your browser. Ensure your backend API and Firebase-related endpoints configured in `.env` are available for full functionality.
 
 ## Scripts
 
 The project includes several npm scripts for common development tasks:
 
-*   `npm start`: Starts the development server.
-*   `npm build`: Builds the application for production to the `build` folder.
-*   `npm test`: Runs tests using Jest in watch mode.
-*   `npm eject`: Removes the single build dependency from your project. Use with caution.
+- `npm start`: Starts the development server.
+- `npm build`: Builds the application for production to the `build` folder.
+- `npm test`: Runs tests using Jest in watch mode.
+- `npm eject`: Removes the single build dependency from your project. Use with caution.
 
 ## Folder Structure
 

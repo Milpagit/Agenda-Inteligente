@@ -1,34 +1,20 @@
-// src/calendar/components/TaskList.jsx
-
 import { useTaskStore, useForm } from "../../hooks";
 import "./TaskList.css";
-import { useEffect, useMemo, memo, useRef } from "react"; // Se importa 'memo'
+import { useMemo, memo, useRef } from "react";
 
 export const TaskList = memo(() => {
   const { tasks, startSavingTask, startTogglingTask, startDeletingTask } =
     useTaskStore();
 
-  // ✅ Evitamos recrear el initialForm en cada render
   const formInitial = useRef({ taskText: "" }).current;
 
   const { taskText, onInputChange, onResetForm } = useForm(formInitial);
 
   const completedTasks = useMemo(
     () => tasks.filter((t) => t.completed).length,
-    [tasks]
+    [tasks],
   );
   const totalTasks = useMemo(() => tasks.length, [tasks]);
-
-  // ✅ DEPURACIÓN: saber si el componente se desmonta (causaría reseteo)
-  useEffect(() => {
-    console.log("TaskList montado");
-    return () => console.log("TaskList desmontado");
-  }, []);
-
-  // ✅ DEPURACIÓN: ver cómo cambia el valor del input
-  useEffect(() => {
-    console.log("Render TaskList - taskText:", taskText);
-  });
 
   const handleNewTaskSubmit = (event) => {
     event.preventDefault();
@@ -59,6 +45,7 @@ export const TaskList = memo(() => {
           name="taskText"
           value={taskText}
           onChange={onInputChange}
+          maxLength={120}
         />
         <button type="submit">+</button>
       </form>
