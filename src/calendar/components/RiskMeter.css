@@ -60,6 +60,13 @@
   text-align: center;
   cursor: help;
   position: relative;
+  border: none;
+  padding: 0;
+}
+
+.risk-tooltip-icon:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .risk-tooltip-icon:hover::after {

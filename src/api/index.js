@@ -1,3 +1,4 @@
 export { default as functionsApi } from "./functionsApi";
 export { default as importApi } from "./importApi";
 export { default as alertsApi } from "./alertsApi";
+export { default as riskApi } from "./riskApi";

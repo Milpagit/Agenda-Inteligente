@@ -122,6 +122,181 @@ def translate_keys(data_dict):
     return translated_data
 
 # ===============================================================
+#  HELPERS: CÁLCULO DE RIESGO Y FACTORES EXPLICABLES
+# ===============================================================
+def clamp(value, min_value=0.0, max_value=1.0):
+    return max(min_value, min(value, max_value))
+
+def normalize_datetime(value):
+    if isinstance(value, datetime.datetime):
+        return value.replace(tzinfo=None)
+    if hasattr(value, "to_datetime"):
+        return value.to_datetime().replace(tzinfo=None)
+    if isinstance(value, str):
+        try:
+            return date_parser.isoparse(value).replace(tzinfo=None)
+        except Exception:
+            return None
+    return None
+
+def load_regression_models():
+    import joblib
+    global preprocessor_regression, regression_model
+    if preprocessor_regression is None:
+        if not os.path.exists(REGRESSION_PREPROCESSOR_LOCAL):
+            download_blob(GCS_BUCKET_NAME, REGRESSION_PREPROCESSOR_GCS, REGRESSION_PREPROCESSOR_LOCAL)
+        print(f"🔄 Cargando preprocesador Regresión desde {REGRESSION_PREPROCESSOR_LOCAL}...")
+        preprocessor_regression = joblib.load(REGRESSION_PREPROCESSOR_LOCAL)
+        print("✅ Preprocesador Regresión cargado.")
+    if regression_model is None:
+        if not os.path.exists(REGRESSION_MODEL_LOCAL):
+            download_blob(GCS_BUCKET_NAME, REGRESSION_MODEL_GCS, REGRESSION_MODEL_LOCAL)
+        print(f"🔄 Cargando modelo Regresión desde {REGRESSION_MODEL_LOCAL}...")
+        regression_model = joblib.load(REGRESSION_MODEL_LOCAL)
+        print("✅ Modelo Regresión cargado.")
+    return preprocessor_regression, regression_model
+
+def load_user_activity_metrics(db, user_id, now):
+    metrics = {
+        "pendingTasks": 0,
+        "completedTasks": 0,
+        "overdueTasks": 0,
+        "habitCompletionRate": None,
+        "weeklyLoadHours": 0.0,
+        "upcomingEvents": 0,
+    }
+
+    try:
+        tasks_ref = db.collection(f"users/{user_id}/tasks").stream()
+        for task_doc in tasks_ref:
+            task = task_doc.to_dict() or {}
+            completed = bool(task.get("completed"))
+            if completed:
+                metrics["completedTasks"] += 1
+            else:
+                metrics["pendingTasks"] += 1
+                due_date = normalize_datetime(task.get("dueDate"))
+                if due_date and due_date < now:
+                    metrics["overdueTasks"] += 1
+    except Exception as task_error:
+        print(f"WARN: Error cargando tareas para {user_id}: {task_error}")
+
+    try:
+        habits_ref = db.collection(f"users/{user_id}/habits").stream()
+        total_rate = 0
+        habit_count = 0
+        for habit_doc in habits_ref:
+            habit = habit_doc.to_dict() or {}
+            completed_days = habit.get("completedDays") or []
+            completed_count = len([day for day in completed_days if day])
+            total_rate += completed_count / 7
+            habit_count += 1
+        if habit_count > 0:
+            metrics["habitCompletionRate"] = total_rate / habit_count
+    except Exception as habit_error:
+        print(f"WARN: Error cargando hábitos para {user_id}: {habit_error}")
+
+    try:
+        week_ahead = now + datetime.timedelta(days=7)
+        events_ref = db.collection(f"users/{user_id}/events").stream()
+        for event_doc in events_ref:
+            event = event_doc.to_dict() or {}
+            start = normalize_datetime(event.get("start"))
+            end = normalize_datetime(event.get("end"))
+            if not start or not end:
+                continue
+            if start <= week_ahead and start >= now:
+                metrics["upcomingEvents"] += 1
+                metrics["weeklyLoadHours"] += max((end - start).total_seconds() / 3600, 0)
+    except Exception as event_error:
+        print(f"WARN: Error cargando eventos para {user_id}: {event_error}")
+
+    return metrics
+
+def build_risk_factors(metrics):
+    factors = []
+    adjustment = 0.0
+
+    overdue = metrics.get("overdueTasks", 0)
+    if overdue > 0:
+        impact = clamp(0.04 + (overdue * 0.02), 0, 0.16)
+        adjustment += impact
+        factors.append({"label": "Tareas vencidas", "value": overdue, "impact": impact})
+
+    pending = metrics.get("pendingTasks", 0)
+    if pending >= 8:
+        impact = 0.08
+        adjustment += impact
+        factors.append({"label": "Tareas pendientes altas", "value": pending, "impact": impact})
+    elif pending >= 4:
+        impact = 0.04
+        adjustment += impact
+        factors.append({"label": "Tareas pendientes moderadas", "value": pending, "impact": impact})
+
+    habit_rate = metrics.get("habitCompletionRate")
+    if habit_rate is not None:
+        if habit_rate < 0.4:
+            impact = 0.07
+            adjustment += impact
+            factors.append({"label": "Bajo cumplimiento de hábitos", "value": f"{int(habit_rate * 100)}%", "impact": impact})
+        elif habit_rate > 0.7:
+            impact = -0.06
+            adjustment += impact
+            factors.append({"label": "Buen cumplimiento de hábitos", "value": f"{int(habit_rate * 100)}%", "impact": impact})
+
+    weekly_load = metrics.get("weeklyLoadHours", 0)
+    if weekly_load >= 18:
+        impact = 0.06
+        adjustment += impact
+        factors.append({"label": "Carga semanal alta", "value": f"{weekly_load:.1f}h", "impact": impact})
+
+    upcoming = metrics.get("upcomingEvents", 0)
+    if upcoming >= 8:
+        impact = 0.04
+        adjustment += impact
+        factors.append({"label": "Muchos eventos próximos", "value": upcoming, "impact": impact})
+
+    return factors, adjustment
+
+def calculate_risk_for_user(db, user_id, user_data, now):
+    import pandas as pd
+
+    profile_es = user_data.get("onboardingData")
+    if not isinstance(profile_es, dict):
+        raise ValueError("Perfil incompleto: onboardingData no disponible.")
+
+    preprocessor, model = load_regression_models()
+    profile_en = translate_keys(profile_es)
+    if not profile_en:
+        raise ValueError("Error traduciendo datos del perfil.")
+
+    df = pd.DataFrame([profile_en])
+    try:
+        cols = preprocessor.feature_names_in_
+    except AttributeError:
+        raise RuntimeError("El preprocesador de Regresión no tiene 'feature_names_in_'.")
+
+    df = df.reindex(columns=cols, fill_value=None)
+    if df.isnull().values.any():
+        missing_cols = df.columns[df.isnull().any()].tolist()
+        raise ValueError(f"Faltan datos del perfil: {', '.join(missing_cols)}")
+
+    processed_data = preprocessor.transform(df)
+    probs = model.predict_proba(processed_data)
+    base_risk = float(probs[0][0])
+
+    metrics = load_user_activity_metrics(db, user_id, now)
+    factors, adjustment = build_risk_factors(metrics)
+    final_risk = clamp(base_risk + adjustment)
+
+    return {
+        "riskScore": final_risk,
+        "baseRisk": base_risk,
+        "factors": factors,
+        "metrics": metrics,
+    }
+
+# ===============================================================
 #  FUNCIÓN 1: PREDECIR PERFIL DE ESTUDIANTE (K-MEANS)
 # ===============================================================
 @https_fn.on_request(memory=512)
@@ -219,9 +394,7 @@ def predict_student_profile(req: https_fn.Request) -> https_fn.Response:
 @scheduler_fn.on_schedule(schedule="0 3 * * *", timezone="America/Mexico_City", memory=512)
 def analyze_risk_on_schedule(event) -> None:
     """Analiza riesgo académico nocturno para todos los usuarios."""
-    import joblib
-    import pandas as pd
-    global preprocessor_regression, regression_model, db_client
+    global db_client
 
     if db_client is None:
         try:
@@ -233,24 +406,6 @@ def analyze_risk_on_schedule(event) -> None:
             return
     
     db = db_client
-
-    try:
-        if preprocessor_regression is None:
-            if not os.path.exists(REGRESSION_PREPROCESSOR_LOCAL):
-                download_blob(GCS_BUCKET_NAME, REGRESSION_PREPROCESSOR_GCS, REGRESSION_PREPROCESSOR_LOCAL)
-            print(f"🔄 Cargando preprocesador Regresión desde {REGRESSION_PREPROCESSOR_LOCAL}...")
-            preprocessor_regression = joblib.load(REGRESSION_PREPROCESSOR_LOCAL)
-            print("✅ Preprocesador Regresión cargado.")
-        
-        if regression_model is None:
-            if not os.path.exists(REGRESSION_MODEL_LOCAL):
-                download_blob(GCS_BUCKET_NAME, REGRESSION_MODEL_GCS, REGRESSION_MODEL_LOCAL)
-            print(f"🔄 Cargando modelo Regresión desde {REGRESSION_MODEL_LOCAL}...")
-            regression_model = joblib.load(REGRESSION_MODEL_LOCAL)
-            print("✅ Modelo Regresión cargado.")
-    except Exception as e:
-        print(f"❌ Error crítico Regresión (descarga/carga): {e}")
-        return
 
     processed_users = 0
     alerts_generated = 0
@@ -274,42 +429,22 @@ def analyze_risk_on_schedule(event) -> None:
                 continue
 
             try:
-                profile_en = translate_keys(profile_es)
-                if not profile_en: 
-                    raise ValueError("Error traduciendo datos del perfil.")
-                
-                df = pd.DataFrame([profile_en])
+                now = datetime.datetime.now()
+                risk_result = calculate_risk_for_user(db, user_id, user_data, now)
 
-                try: 
-                    cols = preprocessor_regression.feature_names_in_
-                except AttributeError: 
-                    raise RuntimeError("El preprocesador de Regresión no tiene 'feature_names_in_'.")
-
-                df = df.reindex(columns=cols, fill_value=None)
-                
-                if df.isnull().values.any():
-                    missing_cols = df.columns[df.isnull().any()].tolist()
-                    print(f"ADVERTENCIA Regresión: Usuario {user_id} omitido por datos faltantes: {missing_cols}.")
-                    continue
-
-                processed_data = preprocessor_regression.transform(df)
-                probs = regression_model.predict_proba(processed_data)
-                
-                # --- NOTA 1.2: Como acordamos, NO se modifica esta lógica de predicción ---
-                risk_prob = float(probs[0][0]) # Se mantiene en índice [0]
-
-                # --- ✅ NUEVA LÓGICA ---
-                # Guardamos el score de riesgo directamente en el perfil del usuario
                 user_doc_ref = db.collection('users').document(user_id)
                 user_doc_ref.update({
-                    'riskScore': risk_prob 
+                    'riskScore': risk_result["riskScore"],
+                    'riskBaseScore': risk_result["baseRisk"],
+                    'riskFactors': risk_result["factors"],
+                    'riskMetrics': risk_result["metrics"],
+                    'riskUpdatedAt': firestore.SERVER_TIMESTAMP
                 })
-                # --- FIN NUEVA LÓGICA ---
 
-                print(f"Usuario {user_id} - Probabilidad de riesgo: {risk_prob:.2f}")
+                print(f"Usuario {user_id} - Riesgo final: {risk_result['riskScore']:.2f}")
                 processed_users += 1
 
-                if risk_prob > 0.6: # Se mantiene la lógica original
+                if risk_result["riskScore"] > 0.6:
                     recommendations_ref = db.collection(f'users/{user_id}/recommendations')
                     existing_alert_query = recommendations_ref.where('type', '==', 'risk_alert').where('viewed', '==', False).limit(1)
                     existing_alerts = list(existing_alert_query.stream())
@@ -336,6 +471,113 @@ def analyze_risk_on_schedule(event) -> None:
         return
 
     print(f"✅ Análisis nocturno completado. Usuarios procesados: {processed_users}. Alertas generadas: {alerts_generated}.")
+
+# ===============================================================
+#  FUNCIÓN 2.1: CALCULAR RIESGO BAJO DEMANDA (HTTP)
+# ===============================================================
+@https_fn.on_request(memory=512)
+def calculate_risk(req: https_fn.Request) -> https_fn.Response:
+    """Calcula riesgo académico bajo demanda y devuelve factores explicativos."""
+    global db_client
+
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Max-Age': '3600'
+    }
+
+    if req.method == 'OPTIONS':
+        return https_fn.Response("", headers=headers, status=204)
+
+    headers['Content-Type'] = 'application/json'
+
+    if req.method not in ['POST', 'GET']:
+        return https_fn.Response(
+            json.dumps({'error': 'Method not allowed'}),
+            status=405,
+            headers=headers
+        )
+
+    if db_client is None:
+        try:
+            print("🔄 Inicializando cliente Firestore (calculate_risk)...")
+            db_client = firestore.client()
+            print("✅ Cliente Firestore inicializado (calculate_risk).")
+        except Exception as db_init_e:
+            return https_fn.Response(
+                json.dumps({'error': f'DB init error: {str(db_init_e)}'}),
+                status=500,
+                headers=headers
+            )
+
+    db = db_client
+    user_id = None
+
+    try:
+        auth_header = req.headers.get('authorization', '')
+        parts = auth_header.split(None, 1)
+        if len(parts) == 2 and parts[0].lower() == 'bearer':
+            id_token = parts[1].strip()
+        else:
+            id_token = None
+
+        if not id_token:
+            return https_fn.Response(
+                json.dumps({'error': 'Auth token missing or invalid format (Bearer).'}),
+                status=401,
+                headers=headers
+            )
+
+        decoded_token = auth.verify_id_token(id_token)
+        user_id = decoded_token['uid']
+    except Exception as auth_error:
+        return https_fn.Response(
+            json.dumps({'error': f'Invalid or expired token: {str(auth_error)}'}),
+            status=401,
+            headers=headers
+        )
+
+    try:
+        user_doc_ref = db.collection('users').document(user_id)
+        user_doc = user_doc_ref.get()
+        if not user_doc.exists:
+            return https_fn.Response(
+                json.dumps({'error': 'User not found.'}),
+                status=404,
+                headers=headers
+            )
+
+        user_data = user_doc.to_dict() or {}
+        now = datetime.datetime.now()
+        risk_result = calculate_risk_for_user(db, user_id, user_data, now)
+
+        user_doc_ref.update({
+            'riskScore': risk_result["riskScore"],
+            'riskBaseScore': risk_result["baseRisk"],
+            'riskFactors': risk_result["factors"],
+            'riskMetrics': risk_result["metrics"],
+            'riskUpdatedAt': firestore.SERVER_TIMESTAMP
+        })
+
+        response = {
+            'riskScore': risk_result["riskScore"],
+            'baseRisk': risk_result["baseRisk"],
+            'factors': risk_result["factors"],
+            'metrics': risk_result["metrics"],
+            'updatedAt': now.isoformat()
+        }
+
+        return https_fn.Response(json.dumps(response), headers=headers, status=200)
+
+    except Exception as e:
+        print(f"❌ Error calculando riesgo bajo demanda (user {user_id}): {e}")
+        traceback.print_exc(limit=1)
+        return https_fn.Response(
+            json.dumps({'error': f'Error calculating risk: {str(e)}'}),
+            status=500,
+            headers=headers
+        )
 
 # ===============================================================
 #  FUNCIÓN 3: IMPORTAR HORARIO (GEMINI) - CORREGIDA

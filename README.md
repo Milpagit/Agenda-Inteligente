@@ -70,6 +70,7 @@ Follow these steps to set up and run the project locally:
     REACT_APP_FUNCTIONS_API_URL="https://<your-cloud-run-url>"
     REACT_APP_IMPORT_SCHEDULE_API_URL="https://<your-cloud-run-url>"
     REACT_APP_ALERTS_API_URL="https://<your-cloud-function-url>"
+    REACT_APP_RISK_API_URL="https://<your-risk-function-url>"
     REACT_APP_APIKEY="<firebase-api-key>"
     REACT_APP_AUTHDOMAIN="<firebase-auth-domain>"
     REACT_APP_PROJECTID="<firebase-project-id>"
