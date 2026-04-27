@@ -8,14 +8,19 @@ import "./CalendarPage.css";
 // Importa desde el "barril" de la carpeta 'calendar' (../index.js)
 import {
   Navbar,
+  BottomNav,
   CalendarEvent,
   CalendarModal,
   FabAddNew,
   FabDelete,
   Sidebar,
+  RiskMeter,
   CalendarToolbar,
   SubjectsModal,
-  ProactiveAlertModal, // <-- 1. Importación del nuevo modal
+  ProactiveAlertModal,
+  RecommendationsWidget,
+  TaskList,
+  HabitTracker,
 } from "../";
 
 // Importa desde el "barril" de la carpeta 'helpers' (../../helpers/index.js)
@@ -30,7 +35,7 @@ import {
   useHabitStore,
   useRecommendationStore,
   useSubjectStore,
-  useNotificationStore, // <-- 2. Importación del nuevo hook
+  useNotificationStore,
 } from "../../hooks";
 
 export const CalendarPage = () => {
@@ -42,11 +47,24 @@ export const CalendarPage = () => {
   const { startLoadingTasks } = useTaskStore();
   const { startLoadingHabits } = useHabitStore();
   const { startLoadingRecommendation } = useRecommendationStore();
-  const { startLoadingAlerts } = useNotificationStore(); // <-- 3. Usar el hook
+  const { startLoadingAlerts } = useNotificationStore();
 
   const [lastView, setLastView] = useState(
-    localStorage.getItem("lastView") || "month"
+    localStorage.getItem("lastView") || "month",
   );
+
+  const calendarFormats = {
+    timeGutterFormat: "h a",
+    agendaTimeFormat: "h:mm a",
+    eventTimeRangeFormat: ({ start, end }, culture, localizer) =>
+      `${localizer.format(start, "h:mm a", culture)} - ${localizer.format(
+        end,
+        "h:mm a",
+        culture,
+      )}`,
+    dayHeaderFormat: (date, culture, localizer) =>
+      localizer.format(date, "eeee d", culture),
+  };
 
   // --- Lógica del Toolbar (sin cambios) ---
   const setToolbarStyle = (view) => {
@@ -74,7 +92,7 @@ export const CalendarPage = () => {
       startLoadingHabits();
       startLoadingSubjects();
       startLoadingRecommendation();
-      startLoadingAlerts(); // <-- 4. LLAMAR A LA NUEVA FUNCIÓN
+      startLoadingAlerts();
     }
   }, [user.uid]);
 
@@ -126,30 +144,47 @@ export const CalendarPage = () => {
         <Sidebar currentView={lastView} />
 
         <div className="calendar-main-content">
-          <Calendar
-            culture="es"
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ flexGrow: 1 }}
-            messages={getMessagesES()}
-            eventPropGetter={eventStyleGetter}
-            components={{
-              event: CalendarEvent,
-              toolbar: CalendarToolbar,
-            }}
-            view={lastView}
-            onView={onViewChanged}
-            onSelectEvent={onSelect}
-            onDoubleClickEvent={onDoubleClick}
-          />
+          <div className="calendar-scroll-container" id="calendar-section">
+            <Calendar
+              culture="es"
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ flexGrow: 1 }}
+              messages={getMessagesES()}
+              formats={calendarFormats}
+              eventPropGetter={eventStyleGetter}
+              components={{
+                event: CalendarEvent,
+                toolbar: CalendarToolbar,
+              }}
+              view={lastView}
+              onView={onViewChanged}
+              onSelectEvent={onSelect}
+              onDoubleClickEvent={onDoubleClick}
+            />
+          </div>
+
+          <div className="mobile-sections">
+            <section className="mobile-section-card" id="suggestions-section">
+              <RecommendationsWidget />
+            </section>
+            <section className="mobile-section-card" id="risk-section">
+              <RiskMeter />
+            </section>
+            <section className="mobile-section-card" id="tasks-section">
+              <TaskList />
+              <HabitTracker />
+            </section>
+          </div>
         </div>
       </div>
+      <BottomNav />
       {/* Renderiza todos los modales */}
       <CalendarModal />
       <SubjectsModal />
-      <ProactiveAlertModal /> {/* <-- 5. RENDERIZAR EL NUEVO MODAL */}
+      <ProactiveAlertModal />
       {/* Renderiza los botones flotantes */}
       <FabAddNew />
       <FabDelete />

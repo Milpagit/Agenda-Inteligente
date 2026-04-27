@@ -19,10 +19,10 @@
 /* Contenedor principal del calendario */
 .rbc-calendar {
   height: 100%;
-  font-family: "Inter", sans-serif;
+  font-family: inherit;
   background-color: var(--color-bg-default);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   overflow: hidden;
 }
 
@@ -34,7 +34,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
   background-color: var(--color-bg-default);
 }
 
@@ -49,7 +49,7 @@
   color: var(--color-text-dark);
   border: 1px solid var(--color-border);
   padding: 8px 15px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin: 0 3px;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -57,22 +57,22 @@
 
 .rbc-btn-group button:hover {
   background-color: var(--color-primary-light);
-  color: var(--color-primary-dark);
-  border-color: var(--color-primary-medium);
+  color: #3f33b6;
+  border-color: #c9c4f6;
 }
 
 .rbc-btn-group button.rbc-active {
-  background-color: var(--color-primary-dark);
+  background-color: #5b4de3;
   color: var(--color-bg-default);
-  border-color: var(--color-primary-dark);
+  border-color: #5b4de3;
 }
 
 /* --- Días de la Semana (Cabeceras) --- */
 .rbc-header {
-  padding: 10px 0;
+  padding: 8px 0;
   font-weight: 600;
-  color: var(--color-text-light);
-  border-bottom: 1px solid var(--color-border) !important;
+  color: #6b7280;
+  border-bottom: none !important;
   background-color: var(--color-bg-default);
 }
 
@@ -100,25 +100,58 @@
   /* Se quitó !important. Ahora toma el color de eventStyleGetter */
   background-color: var(--color-primary-medium);
   border: none;
-  border-radius: 8px !important;
-  padding: 5px 8px !important;
+  border-radius: 12px !important;
+  padding: 4px 8px !important;
   margin-bottom: 4px !important;
-  font-size: 0.85em;
+  font-size: 0.82em;
   /* Se quitó !important. El color "white" lo pone eventStyleGetter */
   color: white;
   font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   overflow: hidden;
 }
 
 .rbc-event:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
 }
 
 .rbc-event-content {
   white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .calendar-scroll-container .rbc-calendar {
+    min-width: 0;
+    height: 100%;
+  }
+
+  .calendar-scroll-container .rbc-month-view {
+    min-width: 720px;
+  }
+
+  .calendar-scroll-container .rbc-month-view,
+  .calendar-scroll-container .rbc-time-view {
+    height: 100%;
+  }
+
+  .rbc-header {
+    padding: 6px 0;
+    font-size: 0.8em;
+  }
+
+  .rbc-date-cell {
+    padding: 4px;
+    font-size: 0.8em;
+  }
+
+  .rbc-event {
+    font-size: 0.75em;
+    padding: 3px 6px !important;
+  }
 }
 
 /* --- ✅ INICIO: CÍRCULO PARA EL DÍA DE HOY --- */
@@ -153,25 +186,63 @@
 /* --- ✅ INICIO: MEJORAS VISTA DE DÍA (MÓVIL) --- */
 /* (Los estilos para que la Vista de Día se vea como en tu imagen) */
 
-/* 1. Suavizar las líneas de hora */
-.rbc-time-view .rbc-time-slot {
-  border-top: 1px solid #f0f0f0; /* Líneas casi invisibles */
+/* 0. Contenedor más limpio, estilo Google */
+.rbc-time-view {
+  border: none;
 }
 
-/* 2. Ocultar la línea gruesa de "ahora" (opcional, pero más limpio) */
+.rbc-time-header {
+  border-bottom: 1px solid #eef0f5;
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid #eef0f5;
+}
+
+.rbc-time-content {
+  background-color: #f8fafc;
+  border-top: none;
+}
+
+.rbc-time-gutter,
+.rbc-time-header-gutter {
+  color: #6b7280;
+  font-size: 0.78em;
+  font-weight: 500;
+}
+
+/* 1. Suavizar las líneas de hora */
+.rbc-time-view .rbc-time-slot {
+  border-top: 1px solid #eef0f5; /* Líneas casi invisibles */
+}
+
+/* 2. Línea de "ahora" más sutil, estilo Google */
 .rbc-time-view .rbc-current-time-indicator {
-  display: none;
+  background-color: #5b4de3;
+  height: 2px;
+  position: relative;
+}
+
+.rbc-time-view .rbc-current-time-indicator::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #5b4de3;
 }
 
 /* 3. Estilo del evento (LA CLAVE) */
 .rbc-time-view .rbc-event {
   border: none !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra suave */
-  border-radius: 8px !important; /* Bordes redondeados */
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1); /* Sombra suave */
+  border-radius: 12px !important; /* Bordes redondeados */
 
   /* Añadimos "relleno" para que el texto no se pegue */
-  margin: 0 5px 3px 5px !important;
-  padding: 5px 8px !important;
+  margin: 0 6px 6px 6px !important;
+  padding: 6px 10px !important;
 }
 
 /* 4. Estilo del texto dentro del evento */

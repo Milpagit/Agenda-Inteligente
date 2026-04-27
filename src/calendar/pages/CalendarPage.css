@@ -10,10 +10,32 @@
 .calendar-main-content {
   flex-grow: 1; /* Permite que esta sección ocupe todo el espacio disponible */
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: #f3f4f6;
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+.calendar-scroll-container {
+  flex-grow: 1;
+  min-width: 0;
+  scroll-margin-top: 80px;
+}
+
+.mobile-sections {
+  display: none;
+}
+
+.mobile-section-card {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  scroll-margin-top: 80px;
+}
+
+.mobile-section-card:empty {
+  display: none;
 }
 
 /* --- ESTILOS PARA PANTALLAS PEQUEÑAS (DISEÑO RESPONSIVO) --- */
@@ -36,5 +58,42 @@
 
   .calendar-main-content {
     padding: 10px; /* Reduce el padding en pantallas más pequeñas */
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-screen {
+    flex-direction: column;
+    height: auto;
+    padding-bottom: 72px;
+  }
+
+  .calendar-sidebar {
+    display: none;
+  }
+
+  .calendar-main-content {
+    padding: 12px 12px 96px;
+    gap: 16px;
+  }
+
+  .calendar-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100dvh - 152px);
+    min-height: 0;
+    max-height: 100dvh;
+    padding-bottom: 24px;
+  }
+
+  .mobile-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-section-card {
+    width: 100%;
+    margin: 0 4px;
   }
 }

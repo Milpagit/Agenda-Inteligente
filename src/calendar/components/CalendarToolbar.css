@@ -3,8 +3,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 16px;
+  border-bottom: none;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  margin-bottom: 12px;
 }
 
 .toolbar-section-left,
@@ -15,46 +19,48 @@
 }
 
 .toolbar-label {
-  font-size: 1.5em;
+  font-size: 1.35em;
   font-weight: 600;
-  color: #46487a;
+  color: #111827;
   /* Evita que el texto largo se rompa en dos líneas en escritorio */
   white-space: nowrap;
 }
 
 .nav-btn,
 .nav-btn-arrow {
-  background-color: transparent;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 8px 15px;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  color: #4b5563;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .nav-btn:hover,
 .nav-btn-arrow:hover {
-  background-color: #f0f0f5;
+  background-color: #e5e7eb;
+  color: #1f2937;
 }
 
 /* --- Grupo de botones con animación --- */
 .view-btn-group {
   display: flex;
   position: relative;
-  background-color: #f0f0f5;
-  border-radius: 12px;
-  padding: 4px;
+  background-color: #eef0f5;
+  border-radius: 999px;
+  padding: 3px;
 }
 
 .view-btn-group button {
   background-color: transparent;
   border: none;
-  padding: 8px 20px;
+  padding: 6px 16px;
   cursor: pointer;
   font-weight: 600;
-  color: #6c757d;
-  border-radius: 8px;
+  color: #6b7280;
+  border-radius: 999px;
   transition: color 0.3s ease;
   z-index: 1;
   white-space: nowrap; /* Evita que "Semana" se parta */
@@ -72,9 +78,9 @@
   height: calc(100% - 8px);
   width: var(--width, 80px);
   left: var(--left, 4px);
-  background-color: #46487a; /* Color principal */
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  background-color: #5b4de3; /* Color principal */
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 0;
 }
@@ -86,7 +92,7 @@
     flex-direction: column;
     align-items: stretch; /* Hacemos que ocupen todo el ancho */
     gap: 15px; /* Espacio entre las dos secciones */
-    padding: 15px 10px; /* Menos padding lateral */
+    padding: 10px 10px; /* Menos padding lateral */
   }
 
   .toolbar-section-left {
@@ -98,7 +104,7 @@
 
   .toolbar-label {
     /* Hacemos el texto más pequeño en móvil */
-    font-size: 1.2em;
+    font-size: 1.1em;
     /* Damos prioridad al label para que ocupe el ancho */
     width: 100%;
     text-align: center;
@@ -118,8 +124,8 @@
 
   .view-btn-group button {
     /* Reducimos el padding para que quepan */
-    padding: 8px 5px;
-    font-size: 0.9em;
+    padding: 6px 5px;
+    font-size: 0.85em;
   }
 
   /* Ocultamos la animación deslizante en móvil, 
@@ -130,7 +136,7 @@
 
   /* En móvil, el botón activo solo cambia de color */
   .view-btn-group button.active {
-    background-color: #46487a;
+    background-color: #5b4de3;
     color: white;
   }
 }

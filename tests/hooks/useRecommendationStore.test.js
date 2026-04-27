@@ -7,6 +7,8 @@ import {
   query,
   updateDoc,
   where,
+  setDoc,
+  increment,
 } from "firebase/firestore/lite";
 import { getRecommendationForProfile } from "../../src/core/recommendationEngine";
 import { useRecommendationStore } from "../../src/hooks/useRecommendationStore";
@@ -31,6 +33,8 @@ jest.mock("firebase/firestore/lite", () => ({
   where: jest.fn(),
   doc: jest.fn(),
   updateDoc: jest.fn(),
+  setDoc: jest.fn(),
+  increment: jest.fn((value) => value),
 }));
 
 jest.mock("../../src/core/recommendationEngine", () => ({
@@ -48,8 +52,17 @@ describe("Tests on useRecommendationStore hook", () => {
         recommendations: {
           activeRecommendation: null,
         },
+        tasks: {
+          tasks: [],
+        },
+        habits: {
+          habits: [],
+        },
+        calendar: {
+          events: [],
+        },
         auth: {
-          user: { uid: "uid-123", cluster: 2 },
+          user: { uid: "uid-123", cluster: 2, riskScore: 0.4 },
         },
       }),
     );
@@ -59,8 +72,11 @@ describe("Tests on useRecommendationStore hook", () => {
     collection.mockReturnValue("recommendations-ref");
     where.mockReturnValue("where-ref");
     query.mockReturnValue("query-ref");
-    getDocs.mockResolvedValue({ empty: true });
+    getDocs
+      .mockResolvedValueOnce({ empty: true })
+      .mockResolvedValueOnce({ forEach: jest.fn() });
     getRecommendationForProfile.mockReturnValue({
+      id: "rec-1",
       text: "Estudia por bloques.",
       action: { title: "Bloque de estudio", duration: 1 },
     });
@@ -71,30 +87,51 @@ describe("Tests on useRecommendationStore hook", () => {
       await result.current.startLoadingRecommendation();
     });
 
-    expect(getRecommendationForProfile).toHaveBeenCalledWith(2);
+    expect(getRecommendationForProfile).toHaveBeenCalledWith(
+      2,
+      expect.any(Object),
+      {},
+    );
     expect(dispatch).toHaveBeenCalledWith(
       onLoadRecommendation({
-        id: null,
+        id: "rec-1",
         text: "Estudia por bloques.",
         action: { title: "Bloque de estudio", duration: 1 },
+        source: "local",
       }),
     );
+    expect(setDoc).toHaveBeenCalled();
   });
 
   test("dismissRecommendation should mark firestore recommendation as viewed", async () => {
-    doc.mockReturnValue("recommendation-doc");
+    doc.mockReturnValueOnce("history-doc").mockReturnValueOnce(
+      "recommendation-doc",
+    );
     updateDoc.mockResolvedValue({});
 
     const { result } = renderHook(() => useRecommendationStore());
 
     await act(async () => {
-      await result.current.dismissRecommendation({ id: "rec-1" });
+      await result.current.dismissRecommendation({
+        id: "rec-1",
+        text: "Texto",
+        source: "firebase",
+      });
     });
 
     expect(dispatch).toHaveBeenCalledWith(onDismissRecommendation());
+    expect(doc).toHaveBeenCalledWith(
+      {},
+      "users/uid-123/recommendationHistory/rec-1",
+    );
     expect(doc).toHaveBeenCalledWith({}, "users/uid-123/recommendations/rec-1");
     expect(updateDoc).toHaveBeenCalledWith("recommendation-doc", {
       viewed: true,
     });
+    expect(setDoc).toHaveBeenCalledWith(
+      "history-doc",
+      expect.any(Object),
+      expect.any(Object),
+    );
   });
 });

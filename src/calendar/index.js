@@ -12,6 +12,8 @@ export * from "./components/FabAddNew";
 export * from "./components/FabDelete";
 export * from "./components/Navbar";
 export * from "./components/Sidebar";
+export * from "./components/BottomNav";
+export * from "./components/RiskMeter";
 export * from "./components/TaskList";
 export * from "./components/HabitTracker";
 export * from "./components/RecommendationsWidget";

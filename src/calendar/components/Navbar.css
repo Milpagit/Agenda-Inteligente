@@ -57,3 +57,18 @@
 .logout-btn i {
   margin-right: 8px;
 }
+
+@media (max-width: 768px) {
+  .navbar-container {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .navbar-brand {
+    display: none;
+  }
+
+  .logout-btn span {
+    display: none;
+  }
+}

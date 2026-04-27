@@ -1,0 +1,108 @@
+/* src/calendar/components/RiskMeter.css */
+
+.risk-meter-container {
+  width: 100%;
+  margin: 18px 0;
+  padding: 18px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(70, 72, 122, 0.12);
+}
+
+.risk-meter-container h5 {
+  margin: 0 0 10px 0;
+  color: #46487a;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.risk-meter-bar {
+  width: 100%;
+  height: 12px;
+  background-color: #f0f0f5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.risk-meter-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition:
+    width 0.5s ease-out,
+    background-color 0.5s ease;
+}
+
+.risk-meter-label {
+  display: block;
+  margin-top: 0;
+  font-weight: 600;
+  font-size: 0.9em;
+  text-align: right;
+}
+
+.risk-meter-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.risk-tooltip-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #5b4de3;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 16px;
+  text-align: center;
+  cursor: help;
+  position: relative;
+}
+
+.risk-tooltip-icon:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 0;
+  transform: translateX(0);
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  width: 230px;
+  white-space: normal;
+  z-index: 10;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.risk-tooltip-icon:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+  z-index: 11;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.risk-tooltip-icon::before,
+.risk-tooltip-icon::after {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}

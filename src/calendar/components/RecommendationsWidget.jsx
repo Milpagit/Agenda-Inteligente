@@ -16,7 +16,7 @@ export const RecommendationsWidget = () => {
 
   const handleDismiss = () => {
     // Ahora pasamos el objeto completo a la función
-    dismissRecommendation(activeRecommendation);
+    dismissRecommendation(activeRecommendation, "dismissed");
   };
 
   const handleSchedule = () => {
@@ -29,7 +29,7 @@ export const RecommendationsWidget = () => {
       end: addHours(new Date(), duration),
     });
     openDateModal();
-    dismissRecommendation(activeRecommendation);
+    dismissRecommendation(activeRecommendation, "scheduled");
   };
 
   if (!activeRecommendation) return null;
