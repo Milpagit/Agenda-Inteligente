@@ -45,30 +45,38 @@ export const HabitTracker = memo(() => {
       </form>
 
       <ul className="habit-list">
-        {habits.map((habit) => (
-          <li key={habit.id} className="habit-item">
-            <span className="habit-name">{habit.name}</span>
-            <button
-              className="delete-btn"
-              onClick={() => startDeletingHabit(habit.id)}
-            >
-              &times;
-            </button>
-            <div className="habit-week-tracker">
-              {daysOfWeek.map((day, dayIndex) => (
-                <div
-                  key={dayIndex}
-                  className={`day-circle ${
-                    habit.completedDays[dayIndex] ? "completed" : ""
-                  }`}
-                  onClick={() => handleDayClick(habit.id, dayIndex)}
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
+        {habits.length === 0 ? (
+          <li className="habit-empty-state">
+            <span className="habit-empty-icon">🌱</span>
+            <p>Aún no tienes hábitos.</p>
+            <small>Crea tu primer hábito arriba y empieza a rastrearlo.</small>
           </li>
-        ))}
+        ) : (
+          habits.map((habit) => (
+            <li key={habit.id} className="habit-item">
+              <span className="habit-name">{habit.name}</span>
+              <button
+                className="delete-btn"
+                onClick={() => startDeletingHabit(habit.id)}
+              >
+                &times;
+              </button>
+              <div className="habit-week-tracker">
+                {daysOfWeek.map((day, dayIndex) => (
+                  <div
+                    key={dayIndex}
+                    className={`day-circle ${
+                      habit.completedDays[dayIndex] ? "completed" : ""
+                    }`}
+                    onClick={() => handleDayClick(habit.id, dayIndex)}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );

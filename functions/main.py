@@ -28,7 +28,7 @@ vision_model = None
 vertexai_initialized = False
 
 # --- CONFIGURACIÓN DE GCS ---
-GCS_BUCKET_NAME = 'agenda-b616a-models'
+GCS_BUCKET_NAME = os.environ.get('GCS_BUCKET_NAME', 'agenda-b616a-models')
 KMEANS_PREPROCESSOR_GCS = 'preprocessor_kmeans.pkl'
 KMEANS_MODEL_GCS = 'modelo_kmeans_4clusters.pkl'
 REGRESSION_PREPROCESSOR_GCS = 'preprocessor_regresion.pkl'
@@ -41,6 +41,30 @@ REGRESSION_MODEL_LOCAL = '/tmp/modelo_regresion_aprobacion.pkl'
 
 # --- Colores predeterminados ---
 presetColors = ["#46487A","#7786C6","#D9534F","#F0AD4E","#FFC212","#5CB85C","#5BC0DE","#F9B0C3","#6C757D","#343A40"]
+
+# --- CORS ---
+# En producción, establece la variable de entorno ALLOWED_ORIGINS con los dominios
+# permitidos separados por coma. Ej: 'https://mi-app.web.app,https://mi-app.firebaseapp.com'
+# Si no se establece, permite todos los orígenes ('*') para desarrollo.
+ALLOWED_ORIGINS_RAW = os.environ.get('ALLOWED_ORIGINS', '*')
+ALLOWED_ORIGINS = [o.strip() for o in ALLOWED_ORIGINS_RAW.split(',') if o.strip()]
+
+def get_cors_headers(request_origin=''):
+    """Devuelve cabeceras CORS validando el origen contra ALLOWED_ORIGINS."""
+    if '*' in ALLOWED_ORIGINS:
+        origin = '*'
+    elif request_origin and request_origin in ALLOWED_ORIGINS:
+        origin = request_origin
+    elif ALLOWED_ORIGINS:
+        origin = ALLOWED_ORIGINS[0]
+    else:
+        origin = ''
+    return {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Max-Age': '3600',
+    }
 
 # ===============================================================
 #  FUNCIÓN HELPER: DESCARGAR DE GCS
@@ -306,19 +330,27 @@ def predict_student_profile(req: https_fn.Request) -> https_fn.Response:
     import pandas as pd
     global preprocessor_kmeans, kmeans_model
 
-    # --- Manejo CORS ACTUALIZADO para Cloud Run ---
-    headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        'Access-Control-Max-Age': '3600'
-    }
-    
+    headers = get_cors_headers(req.headers.get('Origin', ''))
+
     if req.method == 'OPTIONS':
         return https_fn.Response("", headers=headers, status=204)
-    
+
     headers['Content-Type'] = 'application/json'
-    # --- Fin CORS ---
+
+    # --- Verificar token de autenticación ---
+    try:
+        auth_header = req.headers.get('authorization', '')
+        parts = auth_header.split(None, 1)
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            raise ValueError("Token faltante o formato inválido (Bearer).")
+        decoded_token = auth.verify_id_token(parts[1].strip())
+        _ = decoded_token['uid']
+    except Exception as auth_err:
+        return https_fn.Response(
+            json.dumps({'error': f'Token inválido o expirado: {str(auth_err)}'}),
+            status=401, headers=headers
+        )
+    # --- Fin autenticación ---
 
     # --- Carga perezosa de modelos desde GCS ---
     try:
@@ -413,9 +445,7 @@ def analyze_risk_on_schedule(event) -> None:
     try:
         print("Iniciando análisis de riesgo nocturno...")
         
-        # --- NOTA 3.1: Como acordamos, dejamos la consulta sin optimizar
-        # (para producción, añadir .where('onboardingComplete', '==', True))
-        users_ref = db.collection('users').stream()
+        users_ref = db.collection('users').where('onboardingComplete', '==', True).stream()
 
         for user_doc in users_ref:
             user_id = user_doc.id
@@ -480,12 +510,7 @@ def calculate_risk(req: https_fn.Request) -> https_fn.Response:
     """Calcula riesgo académico bajo demanda y devuelve factores explicativos."""
     global db_client
 
-    headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        'Access-Control-Max-Age': '3600'
-    }
+    headers = get_cors_headers(req.headers.get('Origin', ''))
 
     if req.method == 'OPTIONS':
         return https_fn.Response("", headers=headers, status=204)
@@ -602,19 +627,12 @@ def importSchedule(req: https_fn.Request) -> https_fn.Response:
     """Importa horario desde archivo (imagen/PDF base64) usando Gemini Vision."""
     global db_client, vision_model, vertexai_initialized
 
-    # --- Manejo CORS ACTUALIZADO para Cloud Run ---
-    headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        'Access-Control-Max-Age': '3600'
-    }
-    
+    headers = get_cors_headers(req.headers.get('Origin', ''))
+
     if req.method == 'OPTIONS':
         return https_fn.Response("", headers=headers, status=204)
-    
+
     headers['Content-Type'] = 'application/json'
-    # --- Fin CORS ---
 
     # --- Logging Detallado ---
     print("--- importSchedule Request Received ---")
@@ -1009,18 +1027,12 @@ def get_proactive_alerts(req: https_fn.Request) -> https_fn.Response:
     para devolver alertas personalizadas.
     """
     
-    # --- Cabeceras CORS (Manejo de preflight y Content-Type) ---
-    cors_headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Content-Type': 'application/json' 
-    }
-    # Manejar preflight (como lo implementaste)
+    cors_headers = get_cors_headers(req.headers.get('Origin', ''))
+    cors_headers['Content-Type'] = 'application/json'
+
     if req.method == "OPTIONS":
-        preflight_headers = cors_headers.copy()
-        del preflight_headers['Content-Type']
-        return https_fn.Response("", status=200, headers=preflight_headers)
+        preflight = {k: v for k, v in cors_headers.items() if k != 'Content-Type'}
+        return https_fn.Response("", status=200, headers=preflight)
     
     # --- 1. Autenticación ---
     global db_client

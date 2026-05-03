@@ -44,7 +44,7 @@ const getDefaultFormValues = () => {
 
 export const CalendarModal = () => {
   const { isDateModalOpen, closeDateModal } = useUiStore();
-  const { activeEvent, startSavingEvent } = useCalendarStore();
+  const { activeEvent, events, startSavingEvent } = useCalendarStore();
   const { subjects } = useSubjectStore();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isAllDay, setIsAllDay] = useState(false);
@@ -128,7 +128,7 @@ export const CalendarModal = () => {
       Swal.fire(
         "Título inválido",
         `El título debe tener entre ${TITLE_MIN_LENGTH} y ${TITLE_MAX_LENGTH} caracteres.`,
-        "error"
+        "error",
       );
       return;
     }
@@ -137,7 +137,7 @@ export const CalendarModal = () => {
       Swal.fire(
         "Notas inválidas",
         `Las notas no pueden exceder ${NOTES_MAX_LENGTH} caracteres.`,
-        "error"
+        "error",
       );
       return;
     }
@@ -147,6 +147,41 @@ export const CalendarModal = () => {
       Swal.fire("Fechas incorrectas", "Revisa las fechas ingresadas.", "error");
       return;
     }
+
+    // --- Detección de conflictos de horario ---
+    if (!isAllDay) {
+      const newStart = formValues.start.getTime();
+      const newEnd = formValues.end.getTime();
+      const conflicting = events.filter((ev) => {
+        if (ev.id && ev.id === activeEvent?.id) return false; // excluir el evento actual al editar
+        const evStart =
+          ev.start instanceof Date
+            ? ev.start.getTime()
+            : new Date(ev.start).getTime();
+        const evEnd =
+          ev.end instanceof Date
+            ? ev.end.getTime()
+            : new Date(ev.end).getTime();
+        return newStart < evEnd && evStart < newEnd;
+      });
+
+      if (conflicting.length > 0) {
+        const conflictTitles = conflicting
+          .slice(0, 3)
+          .map((ev) => `"${ev.title}"`)
+          .join(", ");
+        const { isConfirmed } = await Swal.fire({
+          title: "Conflicto de horario",
+          html: `Este evento se superpone con: ${conflictTitles}.<br><br>¿Deseas guardarlo de todas formas?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Sí, guardar",
+          cancelButtonText: "Cancelar",
+        });
+        if (!isConfirmed) return;
+      }
+    }
+    // --- Fin detección de conflictos ---
 
     await startSavingEvent({
       ...formValues,

@@ -51,25 +51,33 @@ export const TaskList = memo(() => {
       </form>
 
       <ul className="task-list">
-        {tasks.map((task) => (
-          <li
-            key={task.id}
-            className={`task-item ${task.completed ? "completed" : ""}`}
-          >
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => handleTaskToggle(task.id)}
-            />
-            <span className="task-text">{task.text}</span>
-            <button
-              className="delete-btn"
-              onClick={() => startDeletingTask(task.id)}
-            >
-              &times;
-            </button>
+        {tasks.length === 0 ? (
+          <li className="task-empty-state">
+            <span className="task-empty-icon">✅</span>
+            <p>Sin tareas pendientes.</p>
+            <small>Añade tu primera tarea arriba.</small>
           </li>
-        ))}
+        ) : (
+          tasks.map((task) => (
+            <li
+              key={task.id}
+              className={`task-item ${task.completed ? "completed" : ""}`}
+            >
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => handleTaskToggle(task.id)}
+              />
+              <span className="task-text">{task.text}</span>
+              <button
+                className="delete-btn"
+                onClick={() => startDeletingTask(task.id)}
+              >
+                &times;
+              </button>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );
